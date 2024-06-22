@@ -3,6 +3,9 @@ kind: ConfigMap
 metadata:
   name: rabbitmq-config
 data:
+  # rabbitmq_federation is to federate and synchronize queues
+  # rabbitmq_management is for user interface and dashboard
+  # rabbitmq_peer_discovery_k8s is for discovery mechanism to work
   enabled_plugins: |
     [rabbitmq_federation,rabbitmq_management,rabbitmq_peer_discovery_k8s].
   rabbitmq.conf: |
@@ -10,7 +13,9 @@ data:
     listeners.tcp.default = 5672
 
     cluster_formation.peer_discovery_backend  = rabbit_peer_discovery_k8s
+    ## the below is the k8s host, so that the rabbitMQ can talk to the k8s api (i.e. do kubectl stuff)
     cluster_formation.k8s.host = kubernetes.default.svc.cluster.local
+    ## the below is to tell rabbitMQ instances how to connect to each other (by IP or hostname, here use hostname)
     cluster_formation.k8s.address_type = hostname
     cluster_formation.node_cleanup.only_log_warning = true
     ##cluster_formation.peer_discovery_backend = rabbit_peer_discovery_classic_config

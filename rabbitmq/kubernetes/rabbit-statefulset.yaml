@@ -1,3 +1,20 @@
+# RabbitMQ is provisioned as a statefulset. WHY?
+# Stateful Nature of RabbitMQ
+#     Persistent Identity: Each node in a RabbitMQ cluster requires a persistent and unique identity. 
+#       StatefulSets in Kubernetes provide stable network identities (hostname-0, hostname-1, etc.) for each pod. 
+#       This is crucial for RabbitMQ nodes to maintain consistent node names and configurations, which are essential for clustering and data consistency.
+#     Persistent Storage: RabbitMQ typically requires persistent storage for its data (message queues, exchanges, etc.). 
+#       StatefulSets gives each pod (RabbitMQ node) to have its own PersistentVolumeClaim (PVC), ensuring that data persists across pod restarts or rescheduling.
+# Ordering and Scaling
+#     Ordered Deployment: StatefulSets ensure ordered deployment and scaling of pods. 
+#       For RabbitMQ clusters, the order in which nodes start up is important for clustering and maintaining data consistency. 
+#       StatefulSets guarantee that pods are created and started in a predictable sequence (hostname-0 before hostname-1, and so on), which is crucial during cluster formation.
+
+#     Rolling Updates: StatefulSets support rolling updates with respect to the ordering and identity of pods. 
+#       This ensures minimal disruption to the RabbitMQ cluster during updates or configuration changes.
+# DNS Naming and Service Discovery
+#      Stable DNS Names: StatefulSets provide stable DNS names (hostname-0.service-name.namespace.svc.cluster.local) for each pod. 
+#       This allows RabbitMQ nodes to discover and communicate with each other using predictable and consistent hostnames, which is essential for intra-cluster communication.
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -13,7 +30,10 @@ spec:
       labels:
         app: rabbitmq
     spec:
-      serviceAccountName: rabbitmq
+      serviceAccountName: rabbitmq  # Important so the rabbitmq instances can talk to the k8s api and discover each other.
+      # The below is exactly the same as the security issue you had in ASML. The rabbitmq containers are readOnlyRootFilesystem (not writable).
+      # So mount the relevant folders to a writeable emptyDir, but! Also copy the files inside the folders into the mount so that they are not lost/masked
+      # due to the mounting!!!.
       initContainers:
       - name: config
         image: busybox
@@ -30,9 +50,9 @@ spec:
       - name: rabbitmq
         image: rabbitmq:3.8-management
         ports:
-        - containerPort: 4369
+        - containerPort: 4369  # Port for the clustering to work
           name: discovery
-        - containerPort: 5672
+        - containerPort: 5672  # Port for clients
           name: amqp
         env:
         - name: RABBIT_POD_NAME
@@ -45,16 +65,21 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: RABBITMQ_NODENAME
+          # Rabbitmq requires each rabbitmq node to have a consistent DNS name for communication.
+          # Since we use a statefulset, RABBIT_POD_NAME will always be the same, even after restarts!
+          # In the below Service yaml, we also use headless service (i.e. clusterIP is None), so this RABBITMQ_NODENAME
+          # is exposed to the cluster directly (instead of using a specified service's DNS) and the rabbitmq nodes (i.e. the pods)
+          # can talk to each other directly.
           value: rabbit@$(RABBIT_POD_NAME).rabbitmq.$(RABBIT_POD_NAMESPACE).svc.cluster.local
         - name: RABBITMQ_USE_LONGNAME 
-          value: "true"
+          value: "true"  # Set to true since in the above we use a fully qualified name
         - name: RABBITMQ_CONFIG_FILE
-          value: "/config/rabbitmq"
+          value: "/config/rabbitmq"  # obvious
         - name: RABBITMQ_ERLANG_COOKIE
           valueFrom:
             secretKeyRef:
               name: rabbit-secret
-              key: RABBITMQ_ERLANG_COOKIE
+              key: RABBITMQ_ERLANG_COOKIE  # obvious
         - name: K8S_HOSTNAME_SUFFIX
           value: .rabbitmq.$(RABBIT_POD_NAMESPACE).svc.cluster.local
         volumeMounts:
@@ -78,8 +103,8 @@ spec:
   - metadata:
       name: data
     spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "standard"
+      accessModes: [ "ReadWriteMany" ]
+      storageClassName: "standard"  # run kubectl get storageclass, and apply the class you want
       resources:
         requests:
           storage: 50Mi
@@ -89,7 +114,7 @@ kind: Service
 metadata:
   name: rabbitmq
 spec:
-  clusterIP: None
+  clusterIP: None  
   ports:
   - port: 4369
     targetPort: 4369
