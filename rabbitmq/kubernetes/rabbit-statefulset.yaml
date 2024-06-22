@@ -34,6 +34,11 @@ spec:
       # The below is exactly the same as the security issue you had in ASML. The rabbitmq containers are readOnlyRootFilesystem (not writable).
       # So mount the relevant folders to a writeable emptyDir, but! Also copy the files inside the folders into the mount so that they are not lost/masked
       # due to the mounting!!!.
+      securityContext: # lets do this properly and securely
+        fsGroup: 101
+        runAsNonRoot: true
+        runAsUser: 100
+        runAsGroup: 101
       initContainers:
       - name: config
         image: busybox
@@ -84,7 +89,7 @@ spec:
           value: .rabbitmq.$(RABBIT_POD_NAMESPACE).svc.cluster.local
         volumeMounts:
         - name: data
-          mountPath: /var/lib/rabbitmq
+          mountPath: /var/lib/rabbitmq/mnesia  # !!! Here: https://github.com/docker-library/rabbitmq/issues/171
           readOnly: false
         - name: config-file
           mountPath: /config/
@@ -103,8 +108,9 @@ spec:
   - metadata:
       name: data
     spec:
-      accessModes: [ "ReadWriteMany" ]
-      storageClassName: "standard"  # run kubectl get storageclass, and apply the class you want
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: azurefile-csi-premium  # run kubectl get storageclass, and apply the class you want
       resources:
         requests:
           storage: 50Mi
