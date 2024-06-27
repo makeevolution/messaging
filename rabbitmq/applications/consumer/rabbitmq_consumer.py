@@ -23,10 +23,19 @@ def consume():
     def callback(ch, method, properties, body):
         print(f"Received {body}")
         # Execute an e2e job here (havent figured how yet...)
-
+    
+    # This is also the meat. This function will monitor the queue and call the callback
+    # function we defined above. 
+    # auto_ack is super important to understand, please read: 
+    # https://www.rabbitmq.com/tutorials/tutorial-two-python#message-acknowledgment
+    
     channel.basic_consume(queue=RABBITMQ_QUEUE, on_message_callback=callback, auto_ack=True)
 
     print('Waiting for messages. To exit press CTRL+C')
+
+    # This bit of code will make it so that this function does not terminate, until the stop_event
+    # is set (which will be set when the server is shutting down). This will then ensure this consumer
+    # thread is terminated properly and resources are free-ed.
     while not stop_event.is_set():
         connection.process_data_events(time_limit=1)
     
