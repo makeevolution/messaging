@@ -1,47 +1,27 @@
-import os
-RABBITMQ_HOST = os.getenv('RABBIT_HOST', 'localhost')
-RABBITMQ_PORT = int(os.getenv('RABBIT_PORT', '5672'))
-RABBITMQ_USER = os.getenv('RABBIT_USERNAME', 'guest')
-RABBITMQ_PASSWORD = os.getenv('RABBIT_PASSWORD', 'guest')
-RABBITMQ_QUEUE = 'myQueue'
 
-import pika
-import threading
 
-def connect_to_rabbitmq():
-    credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASSWORD)
-    parameters = pika.ConnectionParameters(host=RABBITMQ_HOST, port=RABBITMQ_PORT, credentials=credentials)
-    connection = pika.BlockingConnection(parameters)
-    return connection
-
-def consume():
-    connection = connect_to_rabbitmq()
-    channel = connection.channel()
-    channel.queue_declare(queue=RABBITMQ_QUEUE, durable=True)
-
-    def callback(ch, method, properties, body):
-        print(f"Received {body}")
-        # Process the message here
-
-    channel.basic_consume(queue=RABBITMQ_QUEUE, on_message_callback=callback, auto_ack=True)
-
-    print('Waiting for messages. To exit press CTRL+C')
-    channel.start_consuming()
-
-def start_consumer_thread():
-    thread = threading.Thread(target=consume)
-    thread.start()
-    return thread
 
 # app/main.py
 from fastapi import FastAPI
+from applications.consumer.rabbitmq_consumer import start_consumer_thread, stop_consumer_thread
 
 app = FastAPI()
 
+# So, the server, upon startup, will create a separate thread that will communicate, monitor
+# and consume messages given on a specific topic.
+# In Django, we can I think put this in ready() function
 @app.on_event("startup")
 async def startup_event():
-    start_consumer_thread()
+    global consumer_thread
+    consumer_thread = start_consumer_thread()
 
+@app.on_event("shutdown")
+async def shutdown_event():
+    stop_consumer_thread()
+    if consumer_thread:
+        consumer_thread.join()
+# Make some fake endpoints. For the purposes of RabbitMQ demo these don't really
+# matter
 @app.get("/")
 async def read_root():
     return {"Hello": "World"}
