@@ -1,20 +1,23 @@
-FROM golang:1.16-alpine as build
+# Use an official Python runtime as a parent image
+FROM python:3.10-slim
 
-RUN apk add --no-cache git
+# Set the working directory in the container
+WORKDIR /app
 
-WORKDIR /src 
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-COPY go.mod ./
-COPY go.sum ./
+# Install any needed packages specified in requirements.txt
+RUN pip install -r requirements.txt
 
-RUN go mod download
+# Make port 80 available to the world outside this container
+EXPOSE 80
 
-COPY publisher.go ./
+# Define environment variable
+ENV RABBIT_HOST=localhost
+ENV RABBIT_PORT=5672
+ENV RABBIT_USERNAME=guest
+ENV RABBIT_PASSWORD=guest
 
-RUN go build publisher.go
-
-FROM alpine as runtime
-
-COPY --from=build /src/publisher /app/publisher
-
-CMD [ "/app/publisher" ]
+# Run app.py when the container launches
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]

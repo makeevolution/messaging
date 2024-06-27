@@ -4,6 +4,7 @@ metadata:
   name: rabbitmq-publisher
 type: Opaque
 data:
+  # Credentials required for the publisher to be able to connect to the queue
   RABBIT_USERNAME: Z3Vlc3Q=
   RABBIT_PASSWORD: Z3Vlc3Q=
 ---
@@ -25,13 +26,14 @@ spec:
     spec:
       containers:
       - name: rabbitmq-publisher
-        image: aimvector/rabbitmq-publisher:v1.0.0
+        image: aldosebastian/rabbitmq-publisher:v1.0.0
         imagePullPolicy: Always
         ports:
         - containerPort: 80
         env:
-        - name: RABBIT_HOST 
-          value: "rabbitmq-0.rabbitmq.rabbits.svc.cluster.local"
+        - name: RABBIT_HOST
+          # Fully qualified domain name of the RabbitMQ instance the publisher will connect to
+          value: "rabbitmq-0.rabbitmq.rabbit.svc.cluster.local"
         - name: RABBIT_PORT
           value: "5672"
         - name: RABBIT_USERNAME
