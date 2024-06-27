@@ -21,20 +21,21 @@ def publish_message(message: Message):
     try:
         print("got here")
         connection = pika.BlockingConnection(parameters)
-        channel = connection.channel()
-        channel.queue_declare(queue='publisher', durable=True)
+        channel = connection.channel() 
+        # This is like get_or_create of Django. If the queue exists already it won't be created.
+        # Otherwise, it will be created.
+        channel.queue_declare(queue='myQueue', durable=True)
         print("gothere 2")
         channel.basic_publish(
             exchange='',
-            routing_key='publisher',
+            routing_key='myQueue',  # this is the queue name to publish to
             body=message.content,
             properties=pika.BasicProperties(
                 delivery_mode=2,  # make message persistent
             )
         )
         print("publishoke")
-        connection.close()
+        connection.close()  # make sure network buffers are flushed and message is delivered to RabbitMQ
         return {"status": "Message published successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
