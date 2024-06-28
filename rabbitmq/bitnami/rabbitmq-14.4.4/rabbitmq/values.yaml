@@ -1,6 +1,3 @@
-# Copyright Broadcom, Inc. All Rights Reserved.
-# SPDX-License-Identifier: APACHE-2.0
-
 ## @section Global parameters
 ## Global Docker image parameters
 ## Please, note that this will override the image parameters, including dependencies, configured to use the global value
@@ -18,7 +15,7 @@ global:
   ##   - myRegistryKeySecretName
   ##
   imagePullSecrets: []
-  storageClass: ""
+  storageClass: "azurefile-csi-premium"  # CHANGE THIS TO WHAT YOUR K8S PROVIDER GIVES YOU!
   ## Compatibility adaptations for Kubernetes platforms
   ##
   compatibility:
@@ -91,30 +88,13 @@ servicenameOverride: ""
 ## @param commonLabels Labels to add to all deployed objects
 ##
 commonLabels: {}
-## @param serviceBindings.enabled Create secret for service binding (Experimental)
-## Ref: https://servicebinding.io/service-provider/
-##
-serviceBindings:
-  enabled: false
+
 ## @param enableServiceLinks Whether information about services should be injected into pod's environment variable
 ## The environment variables injected by service links are not used, but can lead to slow boot times or slow running of the scripts when there are many services in the current namespace.
 ## If you experience slow pod startups or slow running of the scripts you probably want to set this to `false`.
 ##
 enableServiceLinks: true
-## Enable diagnostic mode in the deployment
-##
-diagnosticMode:
-  ## @param diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
-  ##
-  enabled: false
-  ## @param diagnosticMode.command Command to override all containers in the deployment
-  ##
-  command:
-    - sleep
-  ## @param diagnosticMode.args Args to override all containers in the deployment
-  ##
-  args:
-    - infinity
+
 ## @param automountServiceAccountToken Mount Service Account token in pod
 ##
 automountServiceAccountToken: true
@@ -143,11 +123,11 @@ auth:
   ## @param auth.username RabbitMQ application username
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq#environment-variables
   ##
-  username: user
+  username: guest
   ## @param auth.password RabbitMQ application password
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq#environment-variables
   ##
-  password: ""
+  password: "guest"
   ## @param auth.securePassword Whether to set the RabbitMQ password securely. This is incompatible with loading external RabbitMQ definitions and 'true' when not setting the auth.password parameter.
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq#environment-variables
   ##
@@ -282,20 +262,7 @@ clustering:
   ## ref: https://www.rabbitmq.com/partitions.html#automatic-handling
   ##
   partitionHandling: autoheal
-## Loading a RabbitMQ definitions file to configure RabbitMQ
-##
-loadDefinition:
-  ## @param loadDefinition.enabled Enable loading a RabbitMQ definitions file to configure RabbitMQ
-  ##
-  enabled: false
-  ## @param loadDefinition.file Name of the definitions file
-  ##
-  file: "/app/load_definition.json"
-  ## @param loadDefinition.existingSecret Existing secret with the load definitions file
-  ## Can be templated if needed, e.g:
-  ## existingSecret: "{{ .Release.Name }}-load-definition"
-  ##
-  existingSecret: ""
+
 ## @param command Override default container command (useful when using custom images)
 ##
 command: []
@@ -399,6 +366,8 @@ configuration: |-
   ##
   cluster_name = {{ default (include "common.names.fullname" .) .Values.clustering.name }}
   cluster_formation.peer_discovery_backend  = rabbit_peer_discovery_k8s
+  ## IF THE HOST KUBERNETES.DEFAULT DOESNT WORK, TRY USING THE SVC.CLUSTER.LOCAL ONE
+  # cluster_formation.k8s.host = kubernetes.default.svc.cluster.local
   cluster_formation.k8s.host = kubernetes.default
   cluster_formation.k8s.address_type = {{ .Values.clustering.addressType }}
   {{- $svcName := printf "%s-%s" (include "common.names.fullname" .) (default "headless" .Values.servicenameOverride) }}
@@ -545,66 +514,7 @@ advancedConfigurationExistingSecret: ""
 ## @param featureFlags that controls what features are considered to be enabled or available on all cluster nodes.
 ##
 featureFlags: ""
-## LDAP configuration
-##
-ldap:
-  ## @param ldap.enabled Enable LDAP support
-  ##
-  enabled: false
-  ## @param ldap.uri LDAP connection string.
-  ##
-  uri: ""
-  ## @param ldap.servers List of LDAP servers hostnames. This is valid only if ldap.uri is not set
-  ##
-  servers: []
-  ## @param ldap.port LDAP servers port. This is valid only if ldap.uri is not set
-  ##
-  port: ""
-  ## DEPRECATED ldap.user_dn_pattern it will removed in a future, please use userDnPattern instead
-  ## Pattern used to translate the provided username into a value to be used for the LDAP bind
-  ## @param ldap.userDnPattern Pattern used to translate the provided username into a value to be used for the LDAP bind.
-  ## ref: https://www.rabbitmq.com/ldap.html#usernames-and-dns
-  ##
-  userDnPattern: ""
-  ## @param ldap.binddn DN of the account used to search in the LDAP server.
-  ##
-  binddn: ""
-  ## @param ldap.bindpw Password for binddn account.
-  ##
-  bindpw: ""
-  ## @param ldap.basedn Base DN path where binddn account will search for the users.
-  ##
-  basedn: ""
-  ## @param ldap.uidField Field used to match with the user name (uid, samAccountName, cn, etc). It matches with 'dn_lookup_attribute' in RabbitMQ configuration
-  ## ref: https://www.rabbitmq.com/ldap.html#usernames-and-dns
-  ##
-  ## @param ldap.uidField Field used to match with the user name (uid, samAccountName, cn, etc). It matches with 'dn_lookup_attribute' in RabbitMQ configuration
-  ##
-  uidField: ""
-  ## @param ldap.authorisationEnabled Enable LDAP authorisation. Please set 'advancedConfiguration' with tag, topic, resources and vhost mappings
-  ## ref: https://www.rabbitmq.com/ldap.html#authorisation
-  ##
-  authorisationEnabled: false
-  ## @param ldap.tls.enabled Enabled TLS configuration.
-  ## @param ldap.tls.startTls Use STARTTLS instead of LDAPS.
-  ## @param ldap.tls.skipVerify Skip any SSL verification (hostanames or certificates)
-  ## @param ldap.tls.verify Verify connection. Valid values are 'verify_peer' or 'verify_none'
-  ## @param ldap.tls.certificatesMountPath Where LDAP certifcates are mounted.
-  ## @param ldap.tls.certificatesSecret Secret with LDAP certificates.
-  ## @param ldap.tls.CAFilename  CA certificate filename. Should match with the CA entry key in the ldap.tls.certificatesSecret.
-  ## @param ldap.tls.certFilename Client certificate filename to authenticate against the LDAP server. Should match with certificate the entry key in the ldap.tls.certificatesSecret.
-  ## @param ldap.tls.certKeyFilename Client Key filename to authenticate against the LDAP server. Should match with certificate the entry key in the ldap.tls.certificatesSecret.
-  ##
-  tls:
-    enabled: false
-    startTls: false
-    skipVerify: false
-    verify: "verify_peer"
-    certificatesMountPath: /opt/bitnami/rabbitmq/ldap/certs
-    certificatesSecret: ""
-    CAFilename: ""
-    certFilename: ""
-    certKeyFilename: ""
+
 ## @param extraVolumeMounts Optionally specify extra list of additional volumeMounts
 ## Examples:
 ## extraVolumeMounts:
@@ -639,7 +549,7 @@ extraSecretsPrependReleaseName: false
 
 ## @param replicaCount Number of RabbitMQ replicas to deploy
 ##
-replicaCount: 1
+replicaCount: 4  # just some random number
 ## @param schedulerName Use an alternate scheduler, e.g. "stork".
 ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
 ##
@@ -833,7 +743,7 @@ readinessProbe:
 ## @param startupProbe.successThreshold Success threshold for startupProbe
 ##
 startupProbe:
-  enabled: false
+  enabled: true
   initialDelaySeconds: 10
   timeoutSeconds: 20
   periodSeconds: 30
@@ -938,7 +848,7 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  storageClass: ""
+  storageClass: "azurefile-csi-premium"
   ## @param persistence.selector Selector to match an existing Persistent Volume
   ## selector:
   ##   matchLabels:
@@ -977,19 +887,7 @@ persistence:
   ## labels:
   ##   app: my-app
   labels: {}
-## Persistent Volume Claim Retention Policy
-## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#persistentvolumeclaim-retention
-##
-persistentVolumeClaimRetentionPolicy:
-  ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for rabbitmq Statefulset
-  ##
-  enabled: false
-  ## @param persistentVolumeClaimRetentionPolicy.whenScaled Volume retention behavior when the replica count of the StatefulSet is reduced
-  ##
-  whenScaled: Retain
-  ## @param persistentVolumeClaimRetentionPolicy.whenDeleted Volume retention behavior that applies when the StatefulSet is deleted
-  ##
-  whenDeleted: Retain
+
 ## @section Exposure parameters
 ##
 
@@ -1127,6 +1025,212 @@ service:
   ##     timeoutSeconds: 300
   ##
   sessionAffinityConfig: {}
+
+## Network Policies
+## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+##
+networkPolicy:
+  ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+  ## NetworkPolicy is to restrict which pods/resources from which namespaces can communicate with RabbitMQ
+  ##
+  enabled: true
+  ## @param networkPolicy.kubeAPIServerPorts [array] List of possible endpoints to kube-apiserver (limit to your cluster settings to increase security)
+  ##
+  kubeAPIServerPorts: [443, 6443, 8443]
+  ## @param networkPolicy.allowExternal Don't require server label for connections
+  ## The Policy model to apply. When set to false, only pods with the correct
+  ## server label will have network access to the ports server is listening
+  ## on. When true, server will accept connections from any source
+  ## (with the correct destination port).
+  ##
+  allowExternal: true
+  ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+  ##
+  allowExternalEgress: true
+  ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+  ##
+  addExternalClientAccess: true
+  ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+  ## e.g:
+  ## extraIngress:
+  ##   - ports:
+  ##       - port: 1234
+  ##     from:
+  ##       - podSelector:
+  ##           - matchLabels:
+  ##               - role: frontend
+  ##       - podSelector:
+  ##           - matchExpressions:
+  ##               - key: role
+  ##                 operator: In
+  ##                 values:
+  ##                   - frontend
+  extraIngress: []
+  ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy
+  ## e.g:
+  ## extraEgress:
+  ##   - ports:
+  ##       - port: 1234
+  ##     to:
+  ##       - podSelector:
+  ##           - matchLabels:
+  ##               - role: frontend
+  ##       - podSelector:
+  ##           - matchExpressions:
+  ##               - key: role
+  ##                 operator: In
+  ##                 values:
+  ##                   - frontend
+  ##
+  extraEgress: []
+  ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+  ## e.g:
+  ## ingressPodMatchLabels:
+  ##   my-client: "true"
+  #
+  ingressPodMatchLabels: {}
+  ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+  ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+  ##
+  ingressNSMatchLabels: {}
+  ingressNSPodMatchLabels: {}
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+############################# UNUSED (FOR NOW) ################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+
+## LDAP configuration
+##
+ldap:
+  ## @param ldap.enabled Enable LDAP support
+  ##
+  enabled: false
+  ## @param ldap.uri LDAP connection string.
+  ##
+  uri: ""
+  ## @param ldap.servers List of LDAP servers hostnames. This is valid only if ldap.uri is not set
+  ##
+  servers: []
+  ## @param ldap.port LDAP servers port. This is valid only if ldap.uri is not set
+  ##
+  port: ""
+  ## DEPRECATED ldap.user_dn_pattern it will removed in a future, please use userDnPattern instead
+  ## Pattern used to translate the provided username into a value to be used for the LDAP bind
+  ## @param ldap.userDnPattern Pattern used to translate the provided username into a value to be used for the LDAP bind.
+  ## ref: https://www.rabbitmq.com/ldap.html#usernames-and-dns
+  ##
+  userDnPattern: ""
+  ## @param ldap.binddn DN of the account used to search in the LDAP server.
+  ##
+  binddn: ""
+  ## @param ldap.bindpw Password for binddn account.
+  ##
+  bindpw: ""
+  ## @param ldap.basedn Base DN path where binddn account will search for the users.
+  ##
+  basedn: ""
+  ## @param ldap.uidField Field used to match with the user name (uid, samAccountName, cn, etc). It matches with 'dn_lookup_attribute' in RabbitMQ configuration
+  ## ref: https://www.rabbitmq.com/ldap.html#usernames-and-dns
+  ##
+  ## @param ldap.uidField Field used to match with the user name (uid, samAccountName, cn, etc). It matches with 'dn_lookup_attribute' in RabbitMQ configuration
+  ##
+  uidField: ""
+  ## @param ldap.authorisationEnabled Enable LDAP authorisation. Please set 'advancedConfiguration' with tag, topic, resources and vhost mappings
+  ## ref: https://www.rabbitmq.com/ldap.html#authorisation
+  ##
+  authorisationEnabled: false
+  ## @param ldap.tls.enabled Enabled TLS configuration.
+  ## @param ldap.tls.startTls Use STARTTLS instead of LDAPS.
+  ## @param ldap.tls.skipVerify Skip any SSL verification (hostanames or certificates)
+  ## @param ldap.tls.verify Verify connection. Valid values are 'verify_peer' or 'verify_none'
+  ## @param ldap.tls.certificatesMountPath Where LDAP certifcates are mounted.
+  ## @param ldap.tls.certificatesSecret Secret with LDAP certificates.
+  ## @param ldap.tls.CAFilename  CA certificate filename. Should match with the CA entry key in the ldap.tls.certificatesSecret.
+  ## @param ldap.tls.certFilename Client certificate filename to authenticate against the LDAP server. Should match with certificate the entry key in the ldap.tls.certificatesSecret.
+  ## @param ldap.tls.certKeyFilename Client Key filename to authenticate against the LDAP server. Should match with certificate the entry key in the ldap.tls.certificatesSecret.
+  ##
+  tls:
+    enabled: false
+    startTls: false
+    skipVerify: false
+    verify: "verify_peer"
+    certificatesMountPath: /opt/bitnami/rabbitmq/ldap/certs
+    certificatesSecret: ""
+    CAFilename: ""
+    certFilename: ""
+    certKeyFilename: ""
+
+## Loading a RabbitMQ definitions file to configure RabbitMQ
+##
+loadDefinition:
+  ## @param loadDefinition.enabled Enable loading a RabbitMQ definitions file to configure RabbitMQ
+  ##
+  enabled: false
+  ## @param loadDefinition.file Name of the definitions file
+  ##
+  file: "/app/load_definition.json"
+  ## @param loadDefinition.existingSecret Existing secret with the load definitions file
+  ## Can be templated if needed, e.g:
+  ## existingSecret: "{{ .Release.Name }}-load-definition"
+  ##
+  existingSecret: ""
+
+
+## Persistent Volume Claim Retention Policy
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#persistentvolumeclaim-retention
+##
+persistentVolumeClaimRetentionPolicy:
+  ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for rabbitmq Statefulset
+  ##
+  enabled: false
+  ## @param persistentVolumeClaimRetentionPolicy.whenScaled Volume retention behavior when the replica count of the StatefulSet is reduced
+  ##
+  whenScaled: Retain
+  ## @param persistentVolumeClaimRetentionPolicy.whenDeleted Volume retention behavior that applies when the StatefulSet is deleted
+  ##
+  whenDeleted: Retain
+
+## @param serviceBindings.enabled Create secret for service binding (Experimental)
+## Ref: https://servicebinding.io/service-provider/
+##
+## Enable diagnostic mode in the deployment
+##
+diagnosticMode:
+  ## @param diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
+  ##
+  enabled: false
+  ## @param diagnosticMode.command Command to override all containers in the deployment
+  ##
+  command:
+    - sleep
+  ## @param diagnosticMode.args Args to override all containers in the deployment
+  ##
+  args:
+    - infinity
+
+serviceBindings:
+  enabled: false
+
 ## Configure the ingress resource that allows you to access the
 ## RabbitMQ installation. Set up the URL
 ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -1226,76 +1330,9 @@ ingress:
   ## @param ingress.existingSecret It is you own the certificate as secret.
   ##
   existingSecret: ""
-## Network Policies
-## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
-##
-networkPolicy:
-  ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
-  ##
-  enabled: true
-  ## @param networkPolicy.kubeAPIServerPorts [array] List of possible endpoints to kube-apiserver (limit to your cluster settings to increase security)
-  ##
-  kubeAPIServerPorts: [443, 6443, 8443]
-  ## @param networkPolicy.allowExternal Don't require server label for connections
-  ## The Policy model to apply. When set to false, only pods with the correct
-  ## server label will have network access to the ports server is listening
-  ## on. When true, server will accept connections from any source
-  ## (with the correct destination port).
-  ##
-  allowExternal: true
-  ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
-  ##
-  allowExternalEgress: true
-  ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
-  ##
-  addExternalClientAccess: true
-  ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
-  ## e.g:
-  ## extraIngress:
-  ##   - ports:
-  ##       - port: 1234
-  ##     from:
-  ##       - podSelector:
-  ##           - matchLabels:
-  ##               - role: frontend
-  ##       - podSelector:
-  ##           - matchExpressions:
-  ##               - key: role
-  ##                 operator: In
-  ##                 values:
-  ##                   - frontend
-  extraIngress: []
-  ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy
-  ## e.g:
-  ## extraEgress:
-  ##   - ports:
-  ##       - port: 1234
-  ##     to:
-  ##       - podSelector:
-  ##           - matchLabels:
-  ##               - role: frontend
-  ##       - podSelector:
-  ##           - matchExpressions:
-  ##               - key: role
-  ##                 operator: In
-  ##                 values:
-  ##                   - frontend
-  ##
-  extraEgress: []
-  ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
-  ## e.g:
-  ## ingressPodMatchLabels:
-  ##   my-client: "true"
-  #
-  ingressPodMatchLabels: {}
-  ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
-  ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
-  ##
-  ingressNSMatchLabels: {}
-  ingressNSPodMatchLabels: {}
+
 ## @section Metrics Parameters
 ##
-
 ## Prometheus Metrics
 ##
 metrics:
