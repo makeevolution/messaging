@@ -53,7 +53,7 @@ spec:
           mountPath: /etc/rabbitmq/
       containers:
       - name: rabbitmq
-        image: rabbitmq:3.9-management
+        image: rabbitmq:3.12-management
         ports:
         - containerPort: 4369  # Port for the clustering to work
           name: discovery
