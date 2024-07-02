@@ -6,7 +6,7 @@ app = FastAPI()
 
 # So, the server, upon startup, will create a separate thread that will communicate, monitor
 # and consume messages given on a specific topic.
-# In Django, we can I think put this in ready() function
+# In Django, I think it's equivalent to having this in ready() function
 @app.on_event("startup")
 async def startup_event():
     global consumer_thread
