@@ -17,9 +17,8 @@ def consume():
 
     # This is the meat. When there is a message put to the queue, this 
     # function will trigger and do some work. 
-    # I think for our context, this can
-    # be when VFM2 backend publishes a message to the queue, we call k8s to create
-    # a e2e pod.
+    # This can be when backend publishes a message to the queue, we call k8s to create
+    # a worker.
     def callback(ch, method, properties, body):
         print(f"Received {body}")
         # Execute an e2e job here (havent figured how yet...)
