@@ -44,7 +44,11 @@ def consume():
     # Define some queues that listens to predefined specific routing keys (i.e. desired info)
     channel.queue_declare(name='queue.stock.nasdaq.AAPL', durable=True)  # queue for Specific Stock (e.g., AAPL); note: the name can be anything, here made like this for clarity
     channel.queue_bind(exchange="market_topic", routing_key="stock.nasdaq.AAPL")
-
+    # This is the meat. When there is a message put to the queue, this 
+    # function will trigger and do some work.
+    def callback_queue_stock_nasdaq_AAPL(ch, method, properties, body):
+        print(f"Queue with name queue.stock.nasdaq.AAPL received message: {body} from routing key {method.routing_key}")
+    
     channel.queue_declare(name='queue.stock.nasdaq', durable=True)  # queue for entire nasdaq stock market
     channel.queue_bind(exchange="market_topic", routing_key="stock.nasdaq.#")  # So any stock, or even no stock, in the nasdaq, will be listened to
 
@@ -60,19 +64,11 @@ def consume():
     channel.queue_declare(name='queue.bond', durable=True)  # queue for all bond markets
     channel.queue_bind(exchange="market_topic", routing_key="bond.#")  # So any bond, or even no bond, will be listened to
 
+    # So from the example above, the general practice is that the publisher is the one that is as specific as possible, and the queues are the ones that are flexible.
+    # Publishers can ofc use routing keys with wildcards (* and #) to specify general patterns, 
+    # but each message is typically published with a specific routing key that fits its intended category or topic.
 
-    channel.queue_declare(name='')
 
-
-    # This is the meat. When there is a message put to the queue, this 
-    # function will trigger and do some work. 
-    # I think for our context, this can
-    # be when VFM2 backend publishes a message to the queue, we call k8s to create
-    # a e2e pod.
-    def callback(ch, method, properties, body):
-        print(f"Received {body}")
-        # Execute an e2e job here (havent figured how yet...)
-    
     # This is also the meat. This function will monitor the queue and call the callback
     # function we defined above. 
     # auto_ack is super important to understand, please read: 
