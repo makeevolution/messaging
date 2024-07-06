@@ -48,9 +48,17 @@ def consume():
     # function will trigger and do some work.
     def callback_queue_stock_nasdaq_AAPL(ch, method, properties, body):
         print(f"Queue with name queue.stock.nasdaq.AAPL received message: {body} from routing key {method.routing_key}")
-    
+       # This is also the meat. This function will monitor the queue and call the callback
+    # function we defined above. 
+    # auto_ack is super important to understand, please read: 
+    # https://www.rabbitmq.com/tutorials/tutorial-two-python#message-acknowledgment
+    channel.basic_consume(queue=queue.stock.nasdaq.AAPL, on_message_callback=callback_queue_stock_nasdaq_AAPL, auto_ack=True)
+
     channel.queue_declare(name='queue.stock.nasdaq', durable=True)  # queue for entire nasdaq stock market
     channel.queue_bind(exchange="market_topic", routing_key="stock.nasdaq.#")  # So any stock, or even no stock, in the nasdaq, will be listened to
+channel.queue_bind(exchange="market_topic", routing_key="stock.nasdaq.AAPL")
+    def callback_queue_stock_nasdaq_AAPL(ch, method, properties, body):
+        print(f"Queue with name queue.stock.nasdaq.AAPL received message: {body} from routing key {method.routing_key}")
 
     channel.queue_declare(name='queue.stock', durable=True)  # queue for all stock markets
     channel.queue_bind(exchange="market_topic", routing_key="stock.#")  # So any stock, or even no stock, in any market, will be listened to
@@ -69,11 +77,7 @@ def consume():
     # but each message is typically published with a specific routing key that fits its intended category or topic.
 
 
-    # This is also the meat. This function will monitor the queue and call the callback
-    # function we defined above. 
-    # auto_ack is super important to understand, please read: 
-    # https://www.rabbitmq.com/tutorials/tutorial-two-python#message-acknowledgment
-    
+ 
     channel.basic_consume(queue=RABBITMQ_QUEUE, on_message_callback=callback, auto_ack=True)
 
     print('Waiting for messages. To exit press CTRL+C')
