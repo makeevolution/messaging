@@ -1,6 +1,6 @@
 # app/main.py
 from fastapi import FastAPI
-from applications.consumer.rabbitmq_consumer import start_consumer_thread, stop_consumer_thread
+from rabbitmq_consumer import start_consumer_thread, stop_consumer_thread
 
 app = FastAPI()
 

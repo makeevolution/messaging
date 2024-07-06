@@ -1,7 +1,7 @@
 import pika
 import threading
 
-from applications.consumer.config import RABBITMQ_HOST, RABBITMQ_PASSWORD, RABBITMQ_PORT, RABBITMQ_QUEUE, RABBITMQ_USER
+from config import RABBITMQ_HOST, RABBITMQ_PASSWORD, RABBITMQ_PORT, RABBITMQ_QUEUE, RABBITMQ_USER
 stop_event = threading.Event()
 
 def connect_to_rabbitmq():
