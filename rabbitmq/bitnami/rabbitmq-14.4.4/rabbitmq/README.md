@@ -1,4 +1,8 @@
 <!--- app-name: RabbitMQ -->
+# This is my fork of the Bitnami RabbitMQ, after learning how RabbitMQ works in basic way through the self-deploy folder.
+# To deploy, use `helm install releasename -n yournamespace`.
+
+# The below is the standard readme. I don't delete since may contain useful info.
 
 # Bitnami package for RabbitMQ
 
