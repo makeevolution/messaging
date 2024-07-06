@@ -1,4 +1,5 @@
-# Study first the consumer code before this one
+# Study first the consumer code before this one.
+# Turn on the consumer and see the console output of it; it will change based on the routing key you provide.
 # Example call:
 # curl -X POST "http://localhost:8000/publish" -H "Content-Type: application/json" -d '{"routing_key": "stock.nasdaq.AAPL", "message": "AAPL: 150.00"}'
 # The above will make the call channel.basic_publish(exchange='market_topic', routing_key='stock.nasdaq.AAPL', body='AAPL: 150.00')
