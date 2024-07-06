@@ -1,5 +1,7 @@
+# Study first the consumer code before this one
 # Example call:
-# curl -X POST "http://localhost:8000/publish" -H "Content-Type: application/json" -d '{"routing_key": "my_routing_key", "message": "Hello, RabbitMQ!"}'
+# curl -X POST "http://localhost:8000/publish" -H "Content-Type: application/json" -d '{"routing_key": "stock.nasdaq.AAPL", "message": "AAPL: 150.00"}'
+# The above will make the call channel.basic_publish(exchange='market_topic', routing_key='stock.nasdaq.AAPL', body='AAPL: 150.00')
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -24,7 +26,7 @@ def publish_message(routing_key:str, message: Message):
         channel = connection.channel() 
         
         channel.basic_publish(
-            exchange='',
+            exchange='market_topic',
             routing_key=routing_key,  # this is the queue name to publish to
             body=message,
             properties=pika.BasicProperties(
