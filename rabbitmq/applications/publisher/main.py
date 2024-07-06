@@ -1,3 +1,6 @@
+# Example call:
+# curl -X POST "http://localhost:8000/publish" -H "Content-Type: application/json" -d '{"routing_key": "my_routing_key", "message": "Hello, RabbitMQ!"}'
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import os
