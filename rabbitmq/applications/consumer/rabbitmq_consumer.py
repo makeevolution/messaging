@@ -48,7 +48,7 @@ def consume():
     # function will trigger and do some work.
     def callback_queue_stock_nasdaq_AAPL(ch, method, properties, body):
         print(f"Queue with name queue.stock.nasdaq.AAPL received message: {body} from routing key {method.routing_key}")
-       # This is also the meat. This function will monitor the queue and call the callback
+    # This is also the meat. This function will monitor the queue and call the callback
     # function we defined above. 
     # auto_ack is super important to understand, please read: 
     # https://www.rabbitmq.com/tutorials/tutorial-two-python#message-acknowledgment
