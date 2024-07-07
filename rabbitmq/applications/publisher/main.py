@@ -1,7 +1,8 @@
 # Study first the consumer code before this one.
 # Turn on the consumer and see the console output of it; it will change based on the routing key you provide.
+# Turn on this publisher using uvicorn main:app --host 0.0.0.0 --port 81
 # Example call:
-# curl -X POST "http://localhost:8000/publish" -H "Content-Type: application/json" -d '{"routing_key": "stock.nasdaq.AAPL", "message": "AAPL: 150.00"}'
+# curl -X POST "http://localhost:81/publish/" -H "Content-Type: application/json" -d '{"routing_key": "stock.nasdaq.FACE", "message": "AAPL: 150.00"}'
 # The above will make the call channel.basic_publish(exchange='market_topic', routing_key='stock.nasdaq.AAPL', body='AAPL: 150.00')
 
 from fastapi import FastAPI, HTTPException
@@ -24,17 +25,17 @@ def publish_message(routing_key:str, message: Message):
     credentials = pika.PlainCredentials(rabbit_user, rabbit_password)
     parameters = pika.ConnectionParameters(host=rabbit_host, port=rabbit_port, credentials=credentials)
     connection = pika.BlockingConnection(parameters)
-        channel = connection.channel() 
-        
-        channel.basic_publish(
-            exchange='market_topic',
-            routing_key=routing_key,  # this is the queue name to publish to
-            body=message,
-            properties=pika.BasicProperties(
-                delivery_mode=2,  # make message persistent
-            )
+    channel = connection.channel() 
+    
+    channel.basic_publish(
+        exchange='market_topic',
+        routing_key=routing_key,
+        body=message,
+        properties=pika.BasicProperties(
+            delivery_mode=2,  # make message persistent
         )
-        connection.close()  # make sure network buffers are flushed and message is delivered to RabbitMQ
+    )
+    connection.close()  # make sure network buffers are flushed and message is delivered to RabbitMQ
 
 @app.post("/publish/")
 async def publish(msg: Message):

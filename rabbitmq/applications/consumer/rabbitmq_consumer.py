@@ -42,8 +42,8 @@ def consume():
     # channel.basic_publish(exchange='market_topic', routing_key='bond.eu.BOND30', body='EU 30
 
     # Define some queues that listens to predefined specific routing keys (i.e. desired info)
-    channel.queue_declare(name='queue.stock.nasdaq.AAPL', durable=True)  # queue for Specific Stock (e.g., AAPL); note: the name can be anything, here made like this for clarity
-    channel.queue_bind(exchange="market_topic", routing_key="stock.nasdaq.AAPL")
+    channel.queue_declare(queue='queue.stock.nasdaq.AAPL', durable=True)  # queue for Specific Stock (e.g., AAPL); note: the name can be anything, here made like this for clarity
+    channel.queue_bind(queue='queue.stock.nasdaq.AAPL', exchange="market_topic", routing_key="stock.nasdaq.AAPL")
     # This is the meat. When there is a message put to the queue, this 
     # function will trigger and do some work.
     def callback_queue_stock_nasdaq_AAPL(ch, method, properties, body):
@@ -52,30 +52,30 @@ def consume():
     # function we defined above. 
     # auto_ack is super important to understand, please read: 
     # https://www.rabbitmq.com/tutorials/tutorial-two-python#message-acknowledgment
-    channel.basic_consume(queue=queue.stock.nasdaq.AAPL, on_message_callback=callback_queue_stock_nasdaq_AAPL, auto_ack=True)
+    channel.basic_consume(queue='queue.stock.nasdaq.AAPL', on_message_callback=callback_queue_stock_nasdaq_AAPL, auto_ack=True)
 
-    channel.queue_declare(name='queue.stock.nasdaq', durable=True)  # queue for entire nasdaq stock market
-    channel.queue_bind(exchange="market_topic", routing_key="stock.nasdaq.#")  # So any stock, or even no stock, in the nasdaq, will be listened to
+    channel.queue_declare(queue='queue.stock.nasdaq', durable=True)  # queue for entire nasdaq stock market
+    channel.queue_bind(queue='queue.stock.nasdaq', exchange="market_topic", routing_key="stock.nasdaq.#")  # So any stock, or even no stock, in the nasdaq, will be listened to
     def callback_queue_stock_nasdaq(ch, method, properties, body):
-        print(f"Queue with name queue.stock.nasdaq received message: {body} from routing key {method.routing_key}")
+        print(f"Queue with name queue.stock.nasdaq received message: {body} that was sent with routing key: {method.routing_key}")
     channel.basic_consume(queue='queue.stock.nasdaq', on_message_callback=callback_queue_stock_nasdaq, auto_ack=True)
 
-    channel.queue_declare(name='queue.stock', durable=True)  # queue for all stock markets
-    channel.queue_bind(exchange="market_topic", routing_key="stock.#")  # So any stock, or even no stock, in any market, will be listened to
+    channel.queue_declare(queue='queue.stock', durable=True)  # queue for all stock markets
+    channel.queue_bind(queue='queue.stock', exchange="market_topic", routing_key="stock.#")  # So any stock, or even no stock, in any market, will be listened to
     def callback_queue_stock(ch, method, properties, body):
-        print(f"Queue with name queue.stock received message: {body} from routing key {method.routing_key}")
+        print(f"Queue with name queue.stock received message: {body} that was sent with routing key: {method.routing_key}")
     channel.basic_consume(queue='queue.stock', on_message_callback=callback_queue_stock, auto_ack=True)
 
-    channel.queue_declare(name='queue.any_instrument.us.any_ticker', durable=True)  # queue for any instruments with any ticker in the us market
-    channel.queue_bind(exchange="market_topic", routing_key="*.us.*")  # So any instrument with any ticker, as long as it is traded in the us market, will be listened to.
+    channel.queue_declare(queue='queue.any_instrument.us.any_ticker', durable=True)  # queue for any instruments with any ticker in the us market
+    channel.queue_bind(queue='queue.any_instrument.us.any_ticker', exchange="market_topic", routing_key="*.us.*")  # So any instrument with any ticker, as long as it is traded in the us market, will be listened to.
     def callback_any_instrument_us_any_ticker(ch, method, properties, body):
-        print(f"Queue with name queue.any_instrument.us.any_ticker received message: {body} from routing key {method.routing_key}")
+        print(f"Queue with name queue.any_instrument.us.any_ticker received message: {body} that was sent with routing key: {method.routing_key}")
     channel.basic_consume(queue='queue.any_instrument.us.any_ticker', on_message_callback=callback_any_instrument_us_any_ticker, auto_ack=True)
 
-    channel.queue_declare(name='queue.bond', durable=True)  # queue for all bond markets
-    channel.queue_bind(exchange="market_topic", routing_key="bond.#")  # So any bond, or even no bond, will be listened to
+    channel.queue_declare(queue='queue.bond', durable=True)  # queue for all bond markets
+    channel.queue_bind(queue='queue.bond', exchange="market_topic", routing_key="bond.#")  # So any bond, or even no bond, will be listened to
     def callback_queue_bond(ch, method, properties, body):
-        print(f"Queue with name queue.bond received message: {body} from routing key {method.routing_key}")
+        print(f"Queue with name queue.bond received message: {body} that was sent with routing key: {method.routing_key}")
     channel.basic_consume(queue='queue.bond', on_message_callback=callback_queue_bond, auto_ack=True)
 
     # So from the example above, the general practice is that the publisher is the one that is as specific as possible, and the queues are the ones that are flexible.
