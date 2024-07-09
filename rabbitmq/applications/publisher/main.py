@@ -5,20 +5,25 @@
 # curl -X POST "http://localhost:81/publish/" -H "Content-Type: application/json" -d '{"routing_key": "stock.nasdaq.FACE", "message": "AAPL: 150.00"}'
 # The above will make the call channel.basic_publish(exchange='market_topic', routing_key='stock.nasdaq.AAPL', body='AAPL: 150.00')
 
+import time
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import os
 import pika
 
 app = FastAPI()
+COMMS_PORTFOWARDPORT_HOST_MAP = [('5672', 'rabbit@rabbitproper-rabbitmq-0.rabbitproper-rabbitmq-headless.rabbitproper.svc.cluster.local'),
+               ('5673', 'rabbit@rabbitproper-rabbitmq-1.rabbitproper-rabbitmq-headless.rabbitproper.svc.cluster.local'),
+               ('5674', 'rabbit@rabbitproper-rabbitmq-2.rabbitproper-rabbitmq-headless.rabbitproper.svc.cluster.local')
+               ]
 
 class Message(BaseModel):
     routing_key: str
     message: str
 
-def publish_message(routing_key:str, message: Message):
+def publish_message(comms_port: str, routing_key:str, message: Message):
     rabbit_host = os.getenv('RABBIT_HOST', 'localhost')
-    rabbit_port = int(os.getenv('RABBIT_PORT', '5672'))
+    rabbit_port = int(os.getenv('RABBIT_PORT', comms_port))
     rabbit_user = os.getenv('RABBIT_USERNAME', 'guest')
     rabbit_password = os.getenv('RABBIT_PASSWORD', 'guest')
 
@@ -39,8 +44,14 @@ def publish_message(routing_key:str, message: Message):
 
 @app.post("/publish/")
 async def publish(msg: Message):
-    try:
-        publish_message(msg.routing_key, msg.message)
-        return {"status": "Message published successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    while True:
+        for comms_port, hostname in COMMS_PORTFOWARDPORT_HOST_MAP:
+            try:
+                print(f"Publishing to host {hostname}")
+                publish_message(comms_port, msg.routing_key, msg.message)
+                return {"status": "Message published successfully"}
+            except Exception as e:
+                print(e)
+                sleep = 3
+                print(f"Unable to publish to host {hostname}, sleeping for {sleep} secs before trying next host")
+                time.sleep(3)

@@ -15,8 +15,7 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     stop_consumer_thread()
-    if consumer_thread:
-        consumer_thread.join()
+
 # Make some fake endpoints. For the purposes of RabbitMQ demo these don't really
 # matter
 @app.get("/")
