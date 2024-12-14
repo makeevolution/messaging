@@ -1,0 +1,27 @@
+{
+    "name": "Dotnet and Python with C#, Python Tools, and Vim",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "editor.formatOnSave": true,
+                "python.formatting.provider": "black",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true
+            },
+            "extensions": [
+                "ms-dotnettools.csharp",
+                "ms-dotnettools.csdevkit",
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "vscodevim.vim",
+                "njpwerner.autodocstring",
+                "ms-vscode.cpptools"
+            ]
+        }
+    },
+    "postCreateCommand": "dotnet --version && python3 --version && vim --version"
+}
