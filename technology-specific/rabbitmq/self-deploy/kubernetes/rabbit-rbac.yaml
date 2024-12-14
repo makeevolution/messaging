@@ -1,0 +1,36 @@
+# The pods that act as rabbitMQ instances need access to the k8s api (i.e. it needs to be able to be like humans that can do kubectl stuff)
+# This is so it can talk to each other.
+# It does this not by kubectl but by curl to the api
+# Therefore, the pods need rights. We can assign the pods a service account with specific permissions on what it can do on the cluster!
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rabbitmq
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rabbitmq
+rules:
+- apiGroups: 
+    - ""
+  resources: 
+    - endpoints
+  verbs: 
+    - get
+    - list
+    - watch
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rabbitmq
+  namespace: rabbit
+subjects:
+- kind: ServiceAccount
+  name: rabbitmq
+  namespace: rabbit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rabbitmq

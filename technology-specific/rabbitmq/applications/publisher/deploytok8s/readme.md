@@ -1,0 +1,1 @@
+this is optional if you want to deploy the publisher to a k8s cluster
