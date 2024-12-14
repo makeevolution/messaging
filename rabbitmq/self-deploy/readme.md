@@ -1,3 +1,0 @@
-# RabbitMQ
-
-This is my rough attempt of deploying a rabbitMQ cluster from scratch (so not using official Helm charts). This follows the tutorial https://www.youtube.com/watch?v=_lpDfMkxccc. Note many things are out of date since this uses RabbitMQ 3.9, while in 3.13 it is more up to date (e.g. Quorum Queues are used instead of Classic Queues for HA), but the comments in the code are helpful for basic understanding.
