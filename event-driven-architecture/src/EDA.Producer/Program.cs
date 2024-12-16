@@ -39,7 +39,7 @@ var serviceScopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>(
 // Services can have different lifetimes: singleton, transient and scoped.
 // Use CreateScope to obtain a dbContext service instance that is always the same instance everytime
 // dbContext is called.
-// And, use using to dispose of the service
+// And, use using to dispose of the service.
 using (var scope = serviceScopeFactory.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<OrdersDbContext>();
@@ -56,8 +56,10 @@ app.MapPost("/orders", HandleCreateOrder)
 
 app.Run();
 
+// The arguments below that are interfaces, are injected by the DI framework
 static async Task<Order> HandleCreateOrder(CreateOrderRequest request, IOrders orders, IEventPublisher events)
 {
+    // Create new order for customer in db
     var order = await orders.New(request.CustomerId);
 
     await events.Publish(new OrderCreatedEvent()

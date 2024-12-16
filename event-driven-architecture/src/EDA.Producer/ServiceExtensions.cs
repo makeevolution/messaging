@@ -29,8 +29,15 @@ public static class ServiceExtensions
             throw new EventBusConnectionException("", "Host name is null");
         }
         
+        // Configure the DI container to add rabbit mq related services/implementations
+        // Add a singleton that will give the rabbitmqconnection everytime RabbitMQConnection is made as argument to function
         services.AddSingleton(new RabbitMQConnection(hostName!, exchangeName!));
+        // For below, see IOptions in https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-9.0
+        // The RabbitMQ settings we defined in "Messaging" section will be available as a class for easy access.
+        // This is similar to Config class of our Django app, difference being this is injected by framework instead of us instantiating the class
+        // everywhere uncleanly
         services.Configure<RabbitMqSettings>(configuration.GetSection("Messaging"));
+        // Add a singleton that will be injected when an IEventPublisher is made as argument to a function
         services.AddSingleton<IEventPublisher, RabbitMQEventPublisher>();
 
         return services;

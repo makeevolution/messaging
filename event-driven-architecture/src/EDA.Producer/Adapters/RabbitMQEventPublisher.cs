@@ -15,6 +15,7 @@ public class RabbitMQEventPublisher : IEventPublisher
     
     public RabbitMQEventPublisher(IOptions<RabbitMqSettings> settings, ILogger<RabbitMQEventPublisher> logger, RabbitMQConnection connection)
     {
+        // See AddMessaging class for explanation of IOptions
         _logger = logger;
         _connection = connection.Connection;
         _rabbitMqSettings = settings.Value;
@@ -24,7 +25,7 @@ public class RabbitMQEventPublisher : IEventPublisher
     {
         var eventName = "order-created";
         var channel = await _connection.CreateChannelAsync();
-
+        
         var body = JsonSerializer.SerializeToUtf8Bytes(evt);
         
         this._logger.LogInformation($"Publishing '{eventName}' to '{_rabbitMqSettings.ExchangeName}'");

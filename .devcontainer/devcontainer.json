@@ -12,6 +12,13 @@
                 "python.linting.enabled": true,
                 "python.linting.pylintEnabled": true
             },
+            "features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"version": "${templateOption:dockerVersion}",
+			"enableNonRootDocker": "${templateOption:enableNonRootDocker}",
+			"moby": "${templateOption:moby}"
+		}
+	},
             "extensions": [
                 "ms-dotnettools.csharp",
                 "ms-dotnettools.csdevkit",
@@ -23,5 +30,5 @@
             ]
         }
     },
-    "postCreateCommand": "dotnet --version && python3 --version && vim --version"
+    "postCreateCommand": "dotnet --version && python --version && vim --version"
 }
