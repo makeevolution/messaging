@@ -24,6 +24,8 @@ builder.Services.AddSwaggerGen();
 // builder.Configuration gets its values from appsettings.json or appsettings.Development.json
 builder.Services.AddMessaging(builder.Configuration);
 builder.Services.AddDatabase(builder.Configuration);
+// Add the BackgroundService that will publish unprocessed events
+builder.Services.AddHostedService<OutboxWorker>();
 
 var app = builder.Build();
 
@@ -61,12 +63,6 @@ static async Task<Order> HandleCreateOrder(CreateOrderRequest request, IOrders o
 {
     // Create new order for customer in db
     var order = await orders.New(request.CustomerId);
-
-    await events.Publish(new OrderCreatedEvent()
-    {
-        OrderId = order.OrderId
-    });
-
     return order;
 }
 
