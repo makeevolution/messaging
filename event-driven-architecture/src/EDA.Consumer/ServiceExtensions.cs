@@ -1,8 +1,7 @@
-using EDA.Producer.Adapters;
-using EDA.Producer.Core;
-using Microsoft.EntityFrameworkCore;
+using EDA.Consumer.Adapters;
+using EDA.Consumer.Core;
 
-namespace EDA.Producer;
+namespace EDA.Consumer;
 
 public static class ServiceExtensions
 {

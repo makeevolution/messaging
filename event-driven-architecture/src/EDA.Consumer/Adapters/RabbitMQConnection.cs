@@ -3,13 +3,15 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 
 namespace EDA.Consumer.Adapters;
+public record ChannelConfig(string ExchangeName, string QueueName, string RoutingKey, string DeadLetterExchangeName, string DeadLetterQueueName,  AsyncEventHandler<BasicDeliverEventArgs> EventHandler);
+
 public record ConfiguredChannel(IChannel Channel, AsyncEventingBasicConsumer Consumer);
 
 public class RabbitMQConnection
 {
     public IConnection Connection { get; init; }
 
-    public RabbitMQConnection(string hostName, string exchangeName)
+    public RabbitMQConnection(string hostName, string exchangeName, string deadLetterExchangeName)
     {
         var connectionRetry = 10;
 
@@ -27,7 +29,13 @@ public class RabbitMQConnection
 
                 var channel = Connection.CreateChannelAsync().GetAwaiter().GetResult();
                 
+                // We subscribe to two exchanges: The exchange where the order creation event will be published to, as well as
+                // an exchange for dead letters.
+                // A dead letter exchange is an exchange where messages that are unprocessable will be thrown to, instead of just discarded.
+                // SOME LEARNING NOTE: the below is bad code to be applied in Controllers for ASP.NET non core due to synchronization context.
+                // See notes in Obsidian for more information.
                 channel.ExchangeDeclareAsync(exchange: exchangeName, ExchangeType.Topic, durable: true).GetAwaiter().GetResult();
+                channel.ExchangeDeclareAsync(exchange: deadLetterExchangeName, ExchangeType.Direct, durable: true).GetAwaiter().GetResult();
                 break;
             }
             catch (BrokerUnreachableException e)

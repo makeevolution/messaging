@@ -1,4 +1,4 @@
-namespace EDA.Producer.Adapters;
+namespace EDA.Consumer.Adapters;
 
 public class RabbitMqSettings
 {

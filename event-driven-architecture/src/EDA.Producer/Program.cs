@@ -3,8 +3,7 @@
 // When a POST request is made to see EDA.Producer.http to create an Order object
 // Then it will create an Order
 // And save it to a postgres DB
-// And publishes an OrderCreated event to the messaging bus (RabbitMQ)
-
+// And
 using EDA.Producer;
 using EDA.Producer.Adapters;
 using EDA.Producer.Core;

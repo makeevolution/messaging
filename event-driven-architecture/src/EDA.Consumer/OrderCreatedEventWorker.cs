@@ -6,7 +6,6 @@ using CloudNative.CloudEvents.SystemTextJson;
 using EDA.Consumer.Adapters;
 using EDA.Consumer.Core;
 using EDA.Consumer.Core.ExternalEvents;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Microsoft.Extensions.Options;
