@@ -13,7 +13,11 @@ public class PostgresOrders(OrdersDbContext context) : IOrders
         var order = new Order()
         {
             CustomerId = customerId,
-            OrderId = Guid.NewGuid().ToString()
+            // Rig the code to create a Guid that starts with 6
+            // See the consumer code; it will throw this message to dead letter queue
+            // This is to simulate the dead letter queue error handling pattern i.e. unprocessable messages should not
+            // be discarded but stored somewhere for investigation!
+            OrderId = customerId == "error" ? $"6{Guid.NewGuid().ToString()}" : Guid.NewGuid().ToString()
         };
         // With an outbox storing the event to be published in db before publishing, we are sure that the
         // if db save fails, no events are published, and vice versa.

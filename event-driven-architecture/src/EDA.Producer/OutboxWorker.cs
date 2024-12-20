@@ -1,9 +1,6 @@
 using System.Text.Json;
 using EDA.Producer.Adapters;
 using EDA.Producer.Core;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 
 namespace EDA.Producer;
 
@@ -26,12 +23,10 @@ public class OutboxWorker(ILogger<OutboxWorker> logger, IServiceScopeFactory ser
                     {
                         case nameof(OrderCreatedEvent):
                             {
-                                var eventDataString = item.EventData; // A JsonString
-
-                                logger.LogDebug("Publishing data {data} to event bus", eventDataString);
-                                await eventPublisher.Publish(
-                                    JsonSerializer.Deserialize<OrderCreatedEvent>(eventDataString)
-                                );
+                                logger.LogInformation("Publishing data {data} to event bus (using CloudEvent schema)", item.EventData);
+                                // Publish the event
+                                var evt = JsonSerializer.Deserialize<OrderCreatedEvent>(item.EventData);
+                                await eventPublisher.Publish(evt);
                                 item.Processed = true;
                                 dbService.Outbox.Update(item);
                                 break;
