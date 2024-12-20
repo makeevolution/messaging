@@ -70,5 +70,4 @@ public class OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<
             await orderCreatedChannel.BasicRejectAsync(ea.DeliveryTag, deliveryCount < 3);
         }
     }
-    
 }

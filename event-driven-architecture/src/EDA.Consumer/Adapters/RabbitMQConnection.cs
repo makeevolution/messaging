@@ -7,6 +7,8 @@ public record ConfiguredChannel(IChannel Channel, AsyncEventingBasicConsumer Con
 
 public class RabbitMQConnection
 {
+    public IConnection Connection { get; init; }
+
     public RabbitMQConnection(string hostName, string exchangeName)
     {
         var connectionRetry = 10;
@@ -43,7 +45,6 @@ public class RabbitMQConnection
             throw new EventBusConnectionException(hostName, "Unable to connect to RabbitMQ");
         }
     }
-    public IConnection Connection { get; init; }
 
     public async Task<ConfiguredChannel> SetupConsumerFor(ChannelConfig config, CancellationToken stoppingToken)
     {
