@@ -20,9 +20,15 @@ public class OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<
     private IChannel orderCreatedChannel;
     private HashSet<string> _processedEventIds = new();
     
+    /* The actual background job that is periodically executed */
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var configuredChannel = await connection.SetupConsumerFor(new ChannelConfig(settings.Value.ExchangeName, QUEUE_NAME, ROUTING_KEY, settings.Value.DeadLetterExchangeName, DEAD_LETTER_QUEUE_NAME, HandleEvent), stoppingToken);
+        // Create a configured channel to process messages.
+        // A configured channel is something that consists of 2 things: 
+        // 1. A channel with queues and its bindings established
+        // 2. A consumer i.e. event handler that will do something upon messages coming into the queue'
+        var channelConfiguration = new ChannelConfig(settings.Value.ExchangeName, QUEUE_NAME, ROUTING_KEY, settings.Value.DeadLetterExchangeName, DEAD_LETTER_QUEUE_NAME, Consumer);
+        var configuredChannel = await connection.CreateAndConfigureConsumingChannel(channelConfiguration, stoppingToken);
         orderCreatedChannel = configuredChannel.Channel;
         
         while (!stoppingToken.IsCancellationRequested)
@@ -33,7 +39,9 @@ public class OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<
         }
     }
 
-    private async Task HandleEvent(object model, BasicDeliverEventArgs ea)
+    /* Helper method (notice its private) for the background job;
+     this is the consumer */
+    private async Task Consumer(object model, BasicDeliverEventArgs ea)
     {
         var deliveryCount = 0;
                 

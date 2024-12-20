@@ -1,9 +1,18 @@
 // This is our consumer service
 // For more info on how things work first study Producer's program.cs
 
+// In summary on how to setup a pub sub client:
+// Create a connection instance, where the connection is a field
+// i.e. any instance of the connection above will use the same connection
+// (to prevent our stupid VFM2 TooManyConnections issues!!!)
+// Within the instance, we create a configured channel
+// A configured channel consists of:
+// - A channel which has queues and exchanges bound using routing keys
+// - A consumer that subscribes to messages to the queues above
+// That's it.
+
 using EDA.Consumer;
 using EDA.Consumer.Core;
-using EDA.Consumer.Adapters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +24,8 @@ builder.Services.AddHostedService<OrderCreatedEventWorker>();
 // To register that specific implementation, since we are not using ASP.NET here (i.e. no HTTP requests),
 // can only either register the service as a singleton or transient. Just choose singleton to save
 // performance cost of recreating a new handler everytime we call.
-builder.Services.AddScoped<OrderCreatedEventHandler>();
+builder.Services.AddTransient<OrderCreatedEventHandler>();
 
 var app = builder.Build();
 app.Run();
+
