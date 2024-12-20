@@ -1,4 +1,10 @@
-// Entry point to the whole app
+// Entry point to the producer/publisher project
+// It's a simple app:
+// When a POST request is made to see EDA.Producer.http to create an Order object
+// Then it will create an Order
+// And save it to a postgres DB
+// And publishes an OrderCreated event to the messaging bus (RabbitMQ)
+
 using EDA.Producer;
 using EDA.Producer.Adapters;
 using EDA.Producer.Core;
@@ -17,14 +23,36 @@ var builder = WebApplication.CreateBuilder(args);
 // builder above will automatically first appsettings.json, and, appsettings.{ASPNETCORE_ENVIRONMENT}.json
 // builder.Configuration will contain all the contents of these appsettings, plus more internal stuff!
 
-// Next, we add services to the DI container (for dependency injection resolve)
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Next, we add services to the DI container
+// Services is an IServiceCollection which will contain services that can be resolved by the DI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// builder.Configuration gets its values from appsettings.json or appsettings.Development.json
-builder.Services.AddMessaging(builder.Configuration);
-builder.Services.AddDatabase(builder.Configuration);
-// Add the BackgroundService that will publish unprocessed events
+// Where does AddMessaging and AddDatabase services below come from???
+// They come from implementing extension methods feature of .NET
+// In your project code, where ever you define a static class and a static method that accepts an interface as 'this' argument e.g.:
+// public static class someStaticClass
+// {
+//     public static IServiceCollection someStaticMethod(this IServiceCollection services, IConfiguration configuration)
+//     {
+//         services.AddDbContext<OrdersDbContext>(opt =>
+//             opt.UseNpgsql(
+//                 configuration.GetConnectionString("OrdersContext"),
+//                 o => o
+//                     .SetPostgresVersion(17, 0)));
+
+//         services.AddScoped<IOrders, PostgresOrders>();
+
+//         return services;
+//     }
+// }
+// Then you have implemented the extension method feature. The IServiceCollection will now contain someStaticMethod.
+// For the two below, they are implemented in ServiceExtensions.cs
+// Also, the builder.Configuration below gets its values from appsettings.json or appsettings.Development.json
+builder.Services.ConfigureMessaging(builder.Configuration);
+builder.Services.ConfigureDatabase(builder.Configuration);
+
+// The publishing itself will happen as a BackgroundService; see the code in OutboxWorker
+// Here we register the background service itself so it will actually run!
 builder.Services.AddHostedService<OutboxWorker>();
 
 var app = builder.Build();

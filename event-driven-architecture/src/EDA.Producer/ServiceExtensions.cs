@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EDA.Producer;
 
+// Extension methods to extend IServiceCollection
 public static class ServiceExtensions
 {
-    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    /* Configure a database to register orders */
+    public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<OrdersDbContext>(opt =>
             opt.UseNpgsql(
@@ -19,7 +21,8 @@ public static class ServiceExtensions
         return services;
     }
     
-    public static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration configuration)
+    /*Configure connection to RabbitMQ as well as the publisher */
+    public static IServiceCollection ConfigureMessaging(this IServiceCollection services, IConfiguration configuration)
     {
         var hostName = configuration["Messaging:HostName"];
         var exchangeName = configuration["Messaging:ExchangeName"];
