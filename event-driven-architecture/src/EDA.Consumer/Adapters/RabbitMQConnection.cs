@@ -32,7 +32,7 @@ public class RabbitMQConnection
                 // We subscribe to two exchanges: The exchange where the order creation event will be published to, as well as
                 // an exchange for dead letters.
                 // A dead letter exchange is an exchange where messages that are unprocessable will be thrown to, instead of just discarded.
-                // SOME LEARNING NOTE: the below is bad code to be applied in Controllers for ASP.NET non core due to synchronization context.
+                // SOME LEARNING NOTE: the GetAwaiter.GetResult below is bad code to be applied in Controllers for ASP.NET non-core due to synchronization context feature.
                 // See notes in Obsidian for more information.
                 channel.ExchangeDeclareAsync(exchange: exchangeName, ExchangeType.Topic, durable: true).GetAwaiter().GetResult();
                 channel.ExchangeDeclareAsync(exchange: deadLetterExchangeName, ExchangeType.Direct, durable: true).GetAwaiter().GetResult();

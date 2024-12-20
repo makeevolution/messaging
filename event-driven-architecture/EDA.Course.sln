@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6BBCA265-8F9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDA.Producer", "src\EDA.Producer\EDA.Producer.csproj", "{0EF12E60-6BF6-4966-87D2-83DBD555641A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDA.Consumer", "src\EDA.Consumer\EDA.Consumer.csproj", "{68EC2848-B6C8-4397-AA06-5D6B792CA47B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
