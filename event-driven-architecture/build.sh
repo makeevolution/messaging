@@ -12,4 +12,5 @@ cd src/PlantBasedPizza.Payments && docker build -f application/PlantBasedPizza.P
 cd ../../
 cd src/PlantBasedPizza.Recipes && docker build -f applications/PlantBasedPizza.Recipes.Api/Dockerfile-x86 -t recipe-api ../\
 cd ../../
+pwd
 cd src/frontend && docker build -t frontend .
