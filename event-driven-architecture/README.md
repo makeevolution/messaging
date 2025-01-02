@@ -1,3 +1,7 @@
+
+# Notes
+
+Located under [[Big ideas]]
 # Plant Based Pizza
 
 This folder contains all the sample application for running the PlantBasedPizza application. 
