@@ -38,8 +38,10 @@ All the individual microservices can run independently, and all follow the same 
 
 This will run the individual microservice locally.
 
-## overview
+# overview
 ![[Drawing 2024-12-23 09.28.39.excalidraw  | 800x400]]
+
+# Notes on online course videos
 
 ## storage-first API:
 
@@ -83,3 +85,31 @@ This will run the individual microservice locally.
 - Set a deprecation date for your v1 event (min 5:00)!
 	- Once the date is hit then can easily remove this publisher of V1 events from the cache 
 - Evolvability: Your RabbitMQ routing keys should have event version at the end e.g. <eventname>.<eventversion> so subscribers can listen to different versions of that event min 6:10!
+
+# My own notes
+
+## The flow of the program in general
+  See Program.cs of each module's API section of Microservice.
+  The below uses the `submit` endpoint of `orders` as an example and also notes on it.
+
+  - `Program.cs` of each microservice's application is the entrypoint to the application
+	  - Some `builder.Services` use extension methods feature (e.g. AddOrderManagerInfrastructure) located in `PlantBasedPizza.Orders\application\PlantBasedPizza.OrderManager.Infrastructure\Setup.cs`
+	  - All injections to interfaces are done in this class; please study it line by line
+		  - e.g. injecting `OrderEventPublisher` to every call to `IOrderEventPublisher` arguments
+  - API endpoints are defined in `OrderEndpoints.cs`.
+	  - Notice that each endpoint takes in a Handler 
+	  - [FromServices] attribute on the argument of the API, means the argument is injected by the dependency injection framework instead of provided by the client
+  - Notice that many of the API endpoints has the line `handler.Handle` in its body
+	  - All handlers are located under `PlantBasedPizza.Orders\application\PlantBasedPizza.OrderManager.Core\`
+	  - Notice that Handler takes in a repository in its constructor, implemented under `PlantBasedPizza.Orders\application\PlantBasedPizza.OrderManager.Infrastructure\OrderRepository.cs`
+  - Notice in the body of many of the repository (mainly those that does updates/writes), they do two things:
+	  - saves/reads to/from relevant table in DB
+	  - saves events to the outbox
+  - Background worker will pick up outbox events and publish it 
+	  - Background worker located in `PlantBasedPizza.Orders\application\PlantBasedPizza.Orders.Worker\Program.cs`
+		  - It is NOT configured by the `app.MapPost`! These are used for something else!
+		  - The background work is configured by `AddHostedService<OutboxWorker>()`!
+	  - The background worker under `ExecuteAsync` checks `EventType` of each entry inside the outbox
+	  - Then it will publish using the appropriate handler ( `_eventPublisher.PublishOrderCompletedEventV1(orderCompletedIntegrationEvt)` as example) 
+  - Consumer picks up msg from messaging bus, and processes it
+	  - 
