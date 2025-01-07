@@ -29,7 +29,7 @@
               "type": "markdown",
               "state": {
                 "file": "complex-producer-consumer-pizza/README.md",
-                "mode": "source",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
@@ -194,6 +194,9 @@
   },
   "active": "cad15193ca24caf5",
   "lastOpenFiles": [
+    "README.md",
+    "complex-producer-consumer-pizza/README.md",
+    "complex-producer-consumer-pizza/event-catalog/plant-based-pizza/domains/delivery/index.md",
     "complex-producer-consumer-pizza/src/PlantBasedPizza.Account/tests/PlantBasedPizza.Account.IntegrationTests/obj/Debug/net9.0/PlantBasedPizza.Account.IntegrationTests.GeneratedMSBuildEditorConfig.editorconfig",
     "complex-producer-consumer-pizza/src/PlantBasedPizza.Recipes/tests/PlantBasedPizza.Recipes.UnitTests/bin/Debug/net9.0",
     "complex-producer-consumer-pizza/src/PlantBasedPizza.Recipes/tests/PlantBasedPizza.Recipes.UnitTests/bin/Debug",
@@ -204,10 +207,6 @@
     "complex-producer-consumer-pizza/src/PlantBasedPizza.Orders/application/PlantBasedPizza.Orders.Internal/obj/Debug/net9.0/refint",
     "complex-producer-consumer-pizza/src/PlantBasedPizza.Orders/application/PlantBasedPizza.Orders.Internal/obj/Debug/net9.0/PlantBasedPizza.Orders.Internal.GlobalUsings.g.cs",
     "complex-producer-consumer-pizza/src/PlantBasedPizza.Orders/application/PlantBasedPizza.Orders.Internal/obj/Debug/net9.0/PlantBasedPizza.Orders.Internal.GeneratedMSBuildEditorConfig.editorconfig",
-    "complex-producer-consumer-pizza/src/PlantBasedPizza.Orders/application/PlantBasedPizza.Orders.Internal/obj/Debug/net9.0",
-    "README.md",
-    "complex-producer-consumer-pizza/README.md",
-    "complex-producer-consumer-pizza/event-catalog/plant-based-pizza/domains/delivery/index.md",
     "complex-producer-consumer-pizza/Excalidraw/Drawing 2024-12-23 10.14.03.excalidraw.md",
     "complex-producer-consumer-pizza/Excalidraw/Drawing 2024-12-23 09.28.39.excalidraw.md",
     "simple-producer-consumer/README.md",

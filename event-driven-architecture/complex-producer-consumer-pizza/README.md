@@ -107,9 +107,26 @@ This will run the individual microservice locally.
 	  - saves events to the outbox
   - Background worker will pick up outbox events and publish it 
 	  - Background worker located in `PlantBasedPizza.Orders\application\PlantBasedPizza.Orders.Worker\Program.cs`
-		  - It is NOT configured by the `app.MapPost`! These are used for something else!
+		  - It is NOT configured by the `app.MapPost`! See below for what these are for!
 		  - The background work is configured by `AddHostedService<OutboxWorker>()`!
 	  - The background worker under `ExecuteAsync` checks `EventType` of each entry inside the outbox
 	  - Then it will publish using the appropriate handler ( `_eventPublisher.PublishOrderCompletedEventV1(orderCompletedIntegrationEvt)` as example) 
   - Consumer picks up msg from messaging bus, and processes it
-	  - 
+	  - You need to understand first how Dapper works, explained below.
+	  - The endpoints are configured under worker's `Program.cs` `app.MapPost()`
+	  - We use Dapper pub-sub in this project to publish/listen to the messaging bus (in this case `redis`)
+	  - Under e.g. `PlantBasedPizza.Orders\components` you see the dapper `configuration` for the application; where is this actually used?
+	  - Look at [[#Starting an individual service]] section; there you see the fact that we start up the required dependencies using `docker-compose.yml`, and then start the application (be it only consuming or also producing) using the `make` command.
+        ```plaintext
+        Producer
+           |
+           v
+        Message Bus (e.g., Redis, Kafka)
+           |
+           v
+        Dapr Sidecar (Monitors Message Bus)
+           |
+           v
+        HTTP Endpoint in Application (Processes Message)
+		
+      In the `make` command of the sidecar there is `--resources-path`; it is where this `configuration` is used.
