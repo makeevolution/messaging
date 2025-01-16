@@ -19,12 +19,13 @@ namespace PlantBasedPizza.Shared
         {
             services.AddLogging();
             
+            // The AddOpenTelemetry below is supplied by OpenTelemetry.Extensions.Hosting package
             var otel = services.AddOpenTelemetry();
             otel.ConfigureResource(resource => resource
                 .AddDefaultOtelTags(configuration)
                 .AddService(serviceName: applicationName));
             
-            otel.WithTracing(tracing =>
+            otel.WithTracing(tracing =>  // Configure tracing
             {
                 tracing.AddAspNetCoreInstrumentation(options =>
                 {

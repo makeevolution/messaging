@@ -39,7 +39,7 @@ All the individual microservices can run independently, and all follow the same 
 This will run the individual microservice locally.
 
 # overview
-![[Drawing 2024-12-23 09.28.39.excalidraw  | 800x400]]
+![[Drawing 2024-12-23 09.28.39.excalidraw.png]]
 
 # Notes on online course videos
 
@@ -130,3 +130,5 @@ This will run the individual microservice locally.
         HTTP Endpoint in Application (Processes Message)
 		
       In the `make` command of the sidecar there is `--resources-path`; it is where this `configuration` is used.
+
+## OpenTelemetry

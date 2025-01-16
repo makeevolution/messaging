@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Dapr.Client;
 using PlantBasedPizza.Events;
 using PlantBasedPizza.OrderManager.Core.Entities;
@@ -29,6 +30,7 @@ public class OrderEventPublisher(DaprClient daprClient) : IOrderEventPublisher
             { EventConstants.EVENT_ID_HEADER_KEY, eventId },
             { EventConstants.EVENT_TIME_HEADER_KEY, DateTime.UtcNow.ToString(DATE_FORMAT) },
         };
+        Activity.Current?.AddEvent(new ActivityEvent($"about to publish order submitted event with type {eventType} and data {evt.AsString()}"));
         await daprClient.PublishEventAsync(PUB_SUB_NAME, eventType, evt, eventMetadata);
     }
 

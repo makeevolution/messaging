@@ -80,6 +80,8 @@ services:
         "./components",
         "--app-protocol",
         "grpc",
+        "--log-level",
+        "debug"
       ]
     volumes:
       - "./components/:/components" # Mount our components folder for the runtime to use. The mounted location must match the --resources-path argument.

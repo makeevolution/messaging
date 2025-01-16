@@ -35,4 +35,7 @@ build-recipes-arm:
 	cd src/PlantBasedPizza.Recipes;make build-arm
 
 run-local:
-	docker compose up -d; sleep 10; docker compose -f docker-compose-services.yml up -d
+	docker compose up -d; sleep 10; docker compose -f docker-compose-services.yml up -d; docker run -d   --name mongo-express   --link mongodb:mongo  -e ME_CONFIG_MONGODB_SERVER=mongo   -p 33333:8081 --network complex-producer-consumer-pizza_dapr  mongo-express
+
+stop-local:
+	docker compose down; docker compose -f docker-compose-services.yml down; docker rm -f mongo-express

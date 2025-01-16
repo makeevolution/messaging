@@ -41,7 +41,7 @@ public static class EventHandlers
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),
                     });
-
+                    Activity.Current?.AddEvent(new ActivityEvent(""));
                     return Results.Ok();
                 }
                 catch (Exception ex)

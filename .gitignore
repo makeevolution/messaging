@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 obj/
 bin/
+.idea/
 
 # C extensions
 *.so
