@@ -5,6 +5,7 @@ using EDA.Producer;
 using EDA.Producer.Adapters;
 using EDA.Producer.Core;
 using Microsoft.EntityFrameworkCore;
+using shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,8 @@ builder.Services.ConfigureDatabase(builder.Configuration);
 // The publishing itself will happen as a BackgroundService; see the code in OutboxWorker
 // Here we register the background service itself so it will actually run!
 builder.Services.AddHostedService<OutboxWorker>();
+
+builder.Services.AddSharedInfrastructure(builder.Configuration, "EDA.producer");
 
 var app = builder.Build();
 
