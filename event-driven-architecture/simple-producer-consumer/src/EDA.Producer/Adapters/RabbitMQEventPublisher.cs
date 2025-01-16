@@ -16,7 +16,7 @@ public class RabbitMQEventPublisher : IEventPublisher
 
     private readonly IConnection _connection;
     private readonly ILogger<RabbitMQEventPublisher> _logger;
-    
+ 
     public RabbitMQEventPublisher(IOptions<RabbitMqSettings> settings, ILogger<RabbitMQEventPublisher> logger, RabbitMQConnection connection)
     {
         // See ConfigureMessaging class for explanation of IOptions
@@ -40,13 +40,15 @@ public class RabbitMQEventPublisher : IEventPublisher
             Id = Guid.NewGuid().ToString(),
             Data = evt,
         };
-        
+
+        evtWrapper.SetAttributeFromString("traceparent", Activity.Current?.TraceId.ToString());
         var evtFormatter = new JsonEventFormatter();
 
         var json = evtFormatter.ConvertToJsonElement(evtWrapper).ToString();
         var body = Encoding.UTF8.GetBytes(json);
         
         this._logger.LogInformation($"Publishing '{eventName}' to '{_rabbitMqSettings.ExchangeName}'");
+        Activity.Current?.AddEvent(new ActivityEvent("test123"));
         this._logger.LogInformation(json);
         
         //put the data on to the product queue

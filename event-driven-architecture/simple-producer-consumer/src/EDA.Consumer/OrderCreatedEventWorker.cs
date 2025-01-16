@@ -27,13 +27,15 @@ public class OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<
         // A configured channel is something that consists of 2 things: 
         // 1. A channel with queues and its bindings established
         // 2. A consumer i.e. event handler that will do something upon messages coming into the queue'
-        var channelConfiguration = new ChannelConfig(settings.Value.ExchangeName, QUEUE_NAME, ROUTING_KEY, settings.Value.DeadLetterExchangeName, DEAD_LETTER_QUEUE_NAME, Consumer);
+        var channelConfiguration = new ChannelConfig(settings.Value.ExchangeName, 
+            QUEUE_NAME, ROUTING_KEY, settings.Value.DeadLetterExchangeName, DEAD_LETTER_QUEUE_NAME, Consumer);
         var configuredChannel = await connection.CreateAndConfigureConsumingChannel(channelConfiguration, stoppingToken);
         orderCreatedChannel = configuredChannel.Channel;
         
         while (!stoppingToken.IsCancellationRequested)
         {
-            await orderCreatedChannel.BasicConsumeAsync(QUEUE_NAME, false, configuredChannel.Consumer, cancellationToken: stoppingToken);
+            await orderCreatedChannel.BasicConsumeAsync(QUEUE_NAME, false, configuredChannel.Consumer, 
+                cancellationToken: stoppingToken);
             
             await Task.Delay(1000, stoppingToken);
         }
@@ -56,7 +58,8 @@ public class OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<
         {
             var body = ea.Body.ToArray();
             var formatter = new JsonEventFormatter<OrderCreatedEvent>();
-            var evtWrapper = await formatter.DecodeStructuredModeMessageAsync(new MemoryStream(body), new ContentType("application/json"), new List<CloudEventAttribute>(0));
+            var evtWrapper = await formatter.DecodeStructuredModeMessageAsync(new MemoryStream(body), 
+                new ContentType("application/json"), new List<CloudEventAttribute>(0));
             
             if (_processedEventIds.Contains(evtWrapper.Id))
             {

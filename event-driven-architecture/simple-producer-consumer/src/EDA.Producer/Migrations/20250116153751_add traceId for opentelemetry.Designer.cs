@@ -3,6 +3,7 @@ using System;
 using EDA.Producer.Adapters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EDA.Producer.Migrations
 {
     [DbContext(typeof(OrdersDbContext))]
-    partial class OrdersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250116153751_add traceId for opentelemetry")]
+    partial class addtraceIdforopentelemetry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,7 +61,7 @@ namespace EDA.Producer.Migrations
                     b.Property<bool>("Processed")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("TraceParent")
+                    b.Property<string>("TraceId")
                         .IsRequired()
                         .HasColumnType("text");
 

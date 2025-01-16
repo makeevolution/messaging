@@ -1,11 +1,12 @@
 // Entry point to the producer/publisher project
 // See README.md for more info
 
+using System.Diagnostics;
 using EDA.Producer;
 using EDA.Producer.Adapters;
 using EDA.Producer.Core;
 using Microsoft.EntityFrameworkCore;
-using shared;
+using Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,10 +53,10 @@ builder.Services.ConfigureDatabase(builder.Configuration);
 // Here we register the background service itself so it will actually run!
 builder.Services.AddHostedService<OutboxWorker>();
 
-builder.Services.AddSharedInfrastructure(builder.Configuration, "EDA.producer");
+// We add OpenTelemetry instrumentation here. See code in SharedInfrastructure for more information
+builder.Services.AddSharedInfrastructure(builder.Configuration, ApplicationDefaults.ServiceName);
 
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -83,12 +84,13 @@ app.MapPost("/orders", HandleCreateOrder)
     .WithName("CreateOrder")
     .WithOpenApi();
 
-app.Run();
+await app.RunAsync();
 
 // The arguments below that are interfaces, are injected by the DI framework
 static async Task<Order> HandleCreateOrder(CreateOrderRequest request, IOrders orders, IEventPublisher events)
 {
     // Create new order for customer in db
+    Console.WriteLine(Activity.Current?.Id);
     var order = await orders.New(request.CustomerId);
     return order;
 }

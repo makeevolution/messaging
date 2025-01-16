@@ -24,4 +24,10 @@
     <ProjectReference Include="..\shared\shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="application\EDA.Producer.Core\obj\Debug\net9.0\EDA.Producer.Core.sourcelink.json" />
+    <_ContentIncludedByDefault Remove="application\EDA.Producer.Core\obj\EDA.Producer.Core.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="application\EDA.Producer.Core\obj\project.assets.json" />
+  </ItemGroup>
+
 </Project>
