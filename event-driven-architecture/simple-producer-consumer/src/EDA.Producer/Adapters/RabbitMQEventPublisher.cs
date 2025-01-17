@@ -37,19 +37,18 @@ public class RabbitMQEventPublisher : IEventPublisher
             Source = new Uri(SOURCE),
             Time = DateTimeOffset.Now,
             DataContentType = "application/json",
-            Id = Guid.NewGuid().ToString(),
+            Id = Guid.NewGuid().ToString(),  // THIS IS THE ID OF THE EVENT, NOT AN ID RELATED TO TRACING!!!
+            // THIS ID IS PRIMARILY USED TO HELP CONSUMER IMPLEMENT IDEMPOTENCY; NOTHING TO DO WITH OTEL/TRACING!
             Data = evt,
         };
 
-        evtWrapper.SetAttributeFromString("traceparent", Activity.Current?.TraceId.ToString());
+        evtWrapper.SetAttributeFromString("traceparent", Activity.Current?.Id.ToString());
         var evtFormatter = new JsonEventFormatter();
 
         var json = evtFormatter.ConvertToJsonElement(evtWrapper).ToString();
         var body = Encoding.UTF8.GetBytes(json);
         
-        this._logger.LogInformation($"Publishing '{eventName}' to '{_rabbitMqSettings.ExchangeName}'");
-        Activity.Current?.AddEvent(new ActivityEvent("test123"));
-        this._logger.LogInformation(json);
+        Activity.Current?.AddEvent(new ActivityEvent($"Publishing to '{_rabbitMqSettings.ExchangeName}'"));
         
         //put the data on to the product queue
         await channel.BasicPublishAsync(exchange: _rabbitMqSettings.ExchangeName, routingKey: eventName, body: body);

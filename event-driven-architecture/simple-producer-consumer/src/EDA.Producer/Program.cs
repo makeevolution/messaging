@@ -90,7 +90,7 @@ await app.RunAsync();
 static async Task<Order> HandleCreateOrder(CreateOrderRequest request, IOrders orders, IEventPublisher events)
 {
     // Create new order for customer in db
-    Console.WriteLine(Activity.Current?.Id);
+    Console.WriteLine($"The current request has a .NET Activity ID: {Activity.Current?.Id}");
     var order = await orders.New(request.CustomerId);
     return order;
 }

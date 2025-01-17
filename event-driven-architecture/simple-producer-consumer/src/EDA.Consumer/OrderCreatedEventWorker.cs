@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
@@ -12,14 +13,27 @@ using Microsoft.Extensions.Options;
 
 namespace EDA.Consumer;
 
-public class OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<RabbitMqSettings> settings, ILogger<OrderCreatedEventWorker> logger, RabbitMQConnection connection) : BackgroundService
+public class OrderCreatedEventWorker : BackgroundService
 {
     const string QUEUE_NAME = "consumer-order-created";
     const string DEAD_LETTER_QUEUE_NAME = "consumer-order-created-dlq";
     private const string ROUTING_KEY = "order-created";
-    private IChannel orderCreatedChannel;
+    private IChannel? _orderCreatedChannel;
     private HashSet<string> _processedEventIds = new();
-    
+    private readonly ActivitySource _source;
+    private readonly OrderCreatedEventHandler _handler;
+    private readonly IOptions<RabbitMqSettings> _settings;
+    private readonly ILogger<OrderCreatedEventWorker> _logger;
+    private readonly RabbitMQConnection _connection;
+    public OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<RabbitMqSettings> settings, ILogger<OrderCreatedEventWorker> logger, RabbitMQConnection connection)
+    {
+        _handler = handler;
+        _settings = settings;
+        _logger = logger;
+        _connection = connection;
+        _source = new ActivitySource(ApplicationDefaults.ServiceName);
+    }
+
     /* The actual background job that is periodically executed */
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -27,14 +41,14 @@ public class OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<
         // A configured channel is something that consists of 2 things: 
         // 1. A channel with queues and its bindings established
         // 2. A consumer i.e. event handler that will do something upon messages coming into the queue'
-        var channelConfiguration = new ChannelConfig(settings.Value.ExchangeName, 
-            QUEUE_NAME, ROUTING_KEY, settings.Value.DeadLetterExchangeName, DEAD_LETTER_QUEUE_NAME, Consumer);
-        var configuredChannel = await connection.CreateAndConfigureConsumingChannel(channelConfiguration, stoppingToken);
-        orderCreatedChannel = configuredChannel.Channel;
+        var channelConfiguration = new ChannelConfig(_settings.Value.ExchangeName, 
+            QUEUE_NAME, ROUTING_KEY, _settings.Value.DeadLetterExchangeName, DEAD_LETTER_QUEUE_NAME, Consumer);
+        var configuredChannel = await _connection.CreateAndConfigureConsumingChannel(channelConfiguration, stoppingToken);
+        _orderCreatedChannel = configuredChannel.Channel;
         
         while (!stoppingToken.IsCancellationRequested)
         {
-            await orderCreatedChannel.BasicConsumeAsync(QUEUE_NAME, false, configuredChannel.Consumer, 
+            await _orderCreatedChannel.BasicConsumeAsync(QUEUE_NAME, false, configuredChannel.Consumer, 
                 cancellationToken: stoppingToken);
             
             await Task.Delay(1000, stoppingToken);
@@ -52,7 +66,7 @@ public class OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<
             deliveryCount = int.Parse(ea.BasicProperties.Headers["x-delivery-count"].ToString());
         }
             
-        logger.LogInformation("Delivery count is {deliveryCount}", deliveryCount);
+        _logger.LogInformation("Delivery count is {deliveryCount}", deliveryCount);
             
         try
         {
@@ -63,21 +77,31 @@ public class OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<
             
             if (_processedEventIds.Contains(evtWrapper.Id))
             {
-                logger.LogInformation("Event already processed. Skipping.");
-                await orderCreatedChannel.BasicAckAsync(ea.DeliveryTag, false);
+                _logger.LogInformation("Event already processed. Skipping.");
+                await _orderCreatedChannel.BasicAckAsync(ea.DeliveryTag, false);
                 return;
             }
             
-            await handler.Handle(evtWrapper.Data as OrderCreatedEvent);
+            // Get the traceparent from the event wrapper, and start an .NET Activity, so that this event consuming activity is correlated through OTEL!
+            var traceparent = evtWrapper.GetPopulatedAttributes()
+                .Where(attributeValue => attributeValue.Key.ToString() == "traceparent")
+                .Select(attributeValue => attributeValue.Value.ToString()).FirstOrDefault();
+            if (traceparent != null)
+            {
+                var context = ActivityContext.Parse(traceparent, null);  // parse the traceparent to a .NET context
+                using var processingActivity = _source.StartActivity("process222", ActivityKind.Internal, context);
+                
+            }
+            await _handler.Handle(evtWrapper.Data as OrderCreatedEvent);
             
-            await orderCreatedChannel.BasicAckAsync(ea.DeliveryTag, false);
+            await _orderCreatedChannel.BasicAckAsync(ea.DeliveryTag, false);
             _processedEventIds.Add(evtWrapper.Id);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, $" [x] Failure processing message. {ex.Message}");
+            _logger.LogError(ex, $" [x] Failure processing message. {ex.Message}");
                     
-            await orderCreatedChannel.BasicRejectAsync(ea.DeliveryTag, deliveryCount < 3);
+            await _orderCreatedChannel.BasicRejectAsync(ea.DeliveryTag, deliveryCount < 3);
         }
     }
 }

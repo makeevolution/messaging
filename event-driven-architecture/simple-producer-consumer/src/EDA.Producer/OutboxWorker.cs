@@ -35,13 +35,25 @@ public class OutboxWorker : BackgroundService
                 foreach (var item in unprocessedOutboxItems)
                 {
                     using var processingActivity = CreateActivity(item);
-                    processingActivity?.Start();
-
+                    // using is very important, so that everytime we do an activity, the activity is stopped auto!
+                    // Otherwise, OTEL will never process the activity (e.g. send to Jaeger) since the activity is never stopped!
+                    // Having using is equivalent to the following:
+                    // var processingActivity = CreateActivity(item); // Notice there is no using here!
+                    // try
+                    // {
+                    //     processingActivity?.SetTag("exampleTag", "value");
+                    // }
+                    // finally
+                    // {
+                    //     processingActivity?.Stop();  // Explicitly stop the activity, and OTEL will then be able to process the activity!
+                    // }
+                    // If we access the activity through Activity.Current?, it will also nicely be automatically disposed!
                     switch (item.EventType)
                     {
                         case nameof(OrderCreatedEvent):
-                            {
-                                _logger.LogInformation("Publishing data {data} to event bus (using CloudEvent schema)", item.EventData);
+                        {
+                            processingActivity?.AddEvent(new ActivityEvent(
+                                $"Publishing data {item.EventData} to event bus"));
                                 // Publish the event
                                 var evt = JsonSerializer.Deserialize<OrderCreatedEvent>(item.EventData);
                                 await _eventPublisher.Publish(evt);
@@ -71,9 +83,8 @@ public class OutboxWorker : BackgroundService
             try
             {
                 var context = ActivityContext.Parse(outboxItem.TraceParent, null);  // Grab the parent
-                var messageProcessingActivity = _source.StartActivity("process", ActivityKind.Internal, context);
+                return _source.StartActivity("process", ActivityKind.Internal, context);
                 // Now OTEL has instrumented this worker, and it will show up correlated with the parent, in Jaeger.
-                return messageProcessingActivity;
             }
             catch (Exception ex)
             {

@@ -18,6 +18,7 @@
 
 using EDA.Consumer;
 using EDA.Consumer.Core;
+using Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,9 @@ builder.Services.AddHostedService<OrderCreatedEventWorker>();
 // performance cost of recreating a new handler everytime we call.
 builder.Services.AddTransient<OrderCreatedEventHandler>();
 
+// Add OTEL
+builder.Services.AddSharedInfrastructure(builder.Configuration, ApplicationDefaults.ServiceName);
+
 var app = builder.Build();
-app.Run();
+await app.RunAsync();
 

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -16,7 +14,6 @@ namespace Shared
             IConfiguration configuration, string applicationName)
         {
             services.AddLogging();
-            
 
             ConfigureOpenTelemetry(services, configuration, applicationName);
 
