@@ -59,11 +59,11 @@ public class OrderCreatedEventWorker : BackgroundService
      this is the consumer */
     private async Task Consumer(object model, BasicDeliverEventArgs ea)
     {
-        var evtWrapper = await deserializeIncomingEvent(ea);
+        var evtWrapper = await DeserializeIncomingEvent(ea);
 
-        using var instrumentor = instrumentConsumer(evtWrapper);
+        using var instrumentor = InstrumentConsumer(evtWrapper);
 
-        var deliveryCount = obtainDeliveryCount(ea, instrumentor );
+        var deliveryCount = ObtainDeliveryCount(ea, instrumentor );
         try
         {
             //Console.WriteLine($"got message {ea.Body}");
@@ -74,20 +74,23 @@ public class OrderCreatedEventWorker : BackgroundService
                 return;
             }
 
-            await _handler.Handle(evtWrapper.Data as OrderCreatedEventV1);
+            var eventData = evtWrapper.Data as OrderCreatedEventV1;
+            eventData.AddToTelemetry(evtWrapper.Id);
+
+            await _handler.Handle(eventData);
             
             await _orderCreatedChannel.BasicAckAsync(ea.DeliveryTag, false);
             _processedEventIds.Add(evtWrapper.Id);
         }
         catch (Exception ex)
         {
-            instrumentor.AddException(new Exception($" [x] Failure processing message. {ex.Message}"));
+            instrumentor.AddException(ex);
                     
             await _orderCreatedChannel.BasicRejectAsync(ea.DeliveryTag, deliveryCount < 3);
         }
     }
 
-    private Activity? instrumentConsumer(CloudEvent evtWrapper)
+    private Activity? InstrumentConsumer(CloudEvent evtWrapper)
     {
         Activity? instrumentor = null;
         try
@@ -111,16 +114,16 @@ public class OrderCreatedEventWorker : BackgroundService
         }
     }
 
-    private static async Task<CloudEvent> deserializeIncomingEvent(BasicDeliverEventArgs ea)
+    private static async Task<CloudEvent> DeserializeIncomingEvent(BasicDeliverEventArgs ea)
     {
         var body = ea.Body.ToArray();
         var formatter = new JsonEventFormatter<OrderCreatedEventV1>();
         var evtWrapper = await formatter.DecodeStructuredModeMessageAsync(new MemoryStream(body), 
-            new ContentType("application/json"), new List<CloudEventAttribute>(0));
+            new ContentType("application/json"), null);
         return evtWrapper;
     }
 
-    private static int obtainDeliveryCount(BasicDeliverEventArgs ea, Activity? processingActivity)
+    private static int ObtainDeliveryCount(BasicDeliverEventArgs ea, Activity? processingActivity)
     {
         var deliveryCount = 0;
                 

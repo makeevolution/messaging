@@ -7,7 +7,7 @@ services:
       - POSTGRES_PASSWORD=pass
       - POSTGRES_DB=mydb
     networks:
-      - my_restaurant_network
+      - ankiai_network
 
   # pgAdmin service (visualizer)
   pgadmin:
@@ -19,7 +19,7 @@ services:
     ports:
       - "5050:80"  # Expose the pgAdmin web interface
     networks:
-      - my_restaurant_network
+      - ankiai_network
     volumes:
       - ./postgresconfig.json:/pgadmin4/servers.json  # Pre-configured servers
     depends_on:
@@ -32,7 +32,7 @@ services:
       - "15672:15672"
       - "5672:5672"
     networks:
-      - my_restaurant_network
+      - ankiai_network
 
   jaeger:
     image: jaegertracing/opentelemetry-all-in-one:latest
@@ -42,17 +42,20 @@ services:
       - 4317:4317
       - 4318:4318
     networks:
-      - my_restaurant_network
+      - ankiai_network
   
   local.consumer:
     image: eda-consumer
     container_name: "local.eda-consumer"
     ports:
-      - "5271:5271"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - "5271:8080"
+    # For learning purposes: In ASP.NET, if you run using dll, the default
+    # ASPNETCORE_ENVIRONMNENT is Production! Commented out below just to reiterate
+    # the point
+    # environment:
+    #  - ASPNETCORE_ENVIRONMENT=Production
     networks:
-      - my_restaurant_network
+      - ankiai_network
     depends_on:
       - rabbitmq
 
@@ -60,14 +63,17 @@ services:
     image: eda-producer
     container_name: "local.eda-producer"
     ports:
-      - "5093:5093"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - "5093:8080"
+    # For learning purposes: In ASP.NET, if you run using dll, the default
+    # ASPNETCORE_ENVIRONMNENT is Production! Commented out below just to reiterate
+    # the point
+    # environment:
+    #  - ASPNETCORE_ENVIRONMENT=Production
     networks:
-      - my_restaurant_network
+      - ankiai_network
     depends_on:
       - rabbitmq
 
 networks:
-  my_restaurant_network:
+  ankiai_network:
     driver: bridge

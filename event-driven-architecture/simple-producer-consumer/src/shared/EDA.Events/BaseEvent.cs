@@ -39,7 +39,6 @@ public abstract class BaseEvent
         
         Activity.Current?.AddTag("messaging.operation.name", "send");
         Activity.Current?.AddTag("messaging.operation.type", "send");
-        Activity.Current?.AddTag("messaging.system", "dapr.pubsub");
         Activity.Current?.AddTag("messaging.batch.message_count", 1);
         Activity.Current?.AddTag("messaging.destination.name", $"{EventName}.{EventVersion}");
     }

@@ -11,7 +11,6 @@ public class OrderCreatedEventHandler(ILogger<OrderCreatedEventHandler> logger)
 {
     public async Task Handle(OrderCreatedEventV1 orderCreatedEventV1)
     {
-
         logger.LogInformation($"Order {orderCreatedEventV1.OrderId} has been created");
 
         if (orderCreatedEventV1.OrderId.StartsWith("6"))

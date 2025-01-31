@@ -10,6 +10,9 @@ public static class ServiceExtensions
     /* Configure a database to register orders */
     public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        
+        Console.WriteLine("Configuring database...");
+        Console.WriteLine(configuration.GetConnectionString("OrdersContext"));
         services.AddDbContext<OrdersDbContext>(opt =>
             opt.UseNpgsql(
                 configuration.GetConnectionString("OrdersContext"),

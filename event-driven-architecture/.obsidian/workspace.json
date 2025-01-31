@@ -178,6 +178,8 @@
   },
   "active": "5e782c2178ada568",
   "lastOpenFiles": [
+    "simple-producer-consumer/docker-compose.yml~",
+    "simple-producer-consumer/src/EDA.Producer/bin/Debug/net9.0/appsettings.Production.json",
     "simple-producer-consumer/src/EDA.Producer/appsettings.Production.json",
     "simple-producer-consumer/src/EDA.Producer/Dockerfile",
     "simple-producer-consumer/src/EDA.Producer/Makefile",
@@ -187,8 +189,6 @@
     "simple-producer-consumer/src/EDA.Consumer/Dockerfile",
     "simple-producer-consumer/Dockerfile",
     "simple-producer-consumer/docker-compose.yml",
-    "simple-producer-consumer/src/docker-compose.yml",
-    "simple-producer-consumer/deployment",
     "complex-producer-consumer-pizza/Excalidraw/Drawing 2024-12-23 09.28.39.excalidraw.png",
     "complex-producer-consumer-pizza/README.md",
     "complex-producer-consumer-pizza/Excalidraw/Drawing 2024-12-23 09.28.39.excalidraw.md",

@@ -16,7 +16,6 @@ public class RabbitMQEventPublisher : IEventPublisher
 
     private readonly IConnection _connection;
     private readonly ILogger<RabbitMQEventPublisher> _logger;
- 
     public RabbitMQEventPublisher(IOptions<RabbitMqSettings> settings, ILogger<RabbitMQEventPublisher> logger, RabbitMQConnection connection)
     {
         // See ConfigureMessaging class for explanation of IOptions
@@ -36,12 +35,12 @@ public class RabbitMQEventPublisher : IEventPublisher
             Source = new Uri(SOURCE),
             Time = DateTimeOffset.Now,
             DataContentType = "application/json",
-            Id = Guid.NewGuid().ToString(),  // THIS IS THE ID OF THE EVENT, NOT AN ID RELATED TO TRACING!!!
+            Id = Guid.NewGuid().ToString(),  // THIS IS THE EVENT ID, NOT AN ID RELATED TO TRACING!!!
             // THIS ID IS PRIMARILY USED TO HELP CONSUMER IMPLEMENT IDEMPOTENCY; NOTHING TO DO WITH OTEL/TRACING!
             Data = evt,
         };
-
-        evtWrapper.SetAttributeFromString("traceparent", Activity.Current?.Id.ToString());
+        evt.AddToTelemetry(evtWrapper.Id);  // Remember, Id here is the event ID
+        evtWrapper.SetAttributeFromString("traceparent", Activity.Current?.Id);  // This ID is the OTEL related ID!
         var evtFormatter = new JsonEventFormatter();
 
         var json = evtFormatter.ConvertToJsonElement(evtWrapper).ToString();
@@ -49,7 +48,6 @@ public class RabbitMQEventPublisher : IEventPublisher
         
         Activity.Current?.AddEvent(new ActivityEvent($"Publishing to '{_rabbitMqSettings.ExchangeName}'"));
         
-        //put the data on to the product queue
         await channel.BasicPublishAsync(exchange: _rabbitMqSettings.ExchangeName, routingKey: eventName, body: body);
     }
 }

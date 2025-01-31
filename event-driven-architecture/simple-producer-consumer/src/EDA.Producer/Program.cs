@@ -58,11 +58,9 @@ builder.Services.AddSharedInfrastructure(builder.Configuration, ApplicationDefau
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+Console.WriteLine("Configuring Swagger UI");
     app.UseSwagger();
     app.UseSwaggerUI();
-}
 
 // app.Services is the DI container of the ASP.NET Core app
 var serviceScopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
@@ -90,7 +88,6 @@ await app.RunAsync();
 static async Task<Order> HandleCreateOrder(CreateOrderRequest request, IOrders orders, IEventPublisher events)
 {
     // Create new order for customer in db
-    Console.WriteLine($"The current request has a .NET Activity ID: {Activity.Current?.Id}");
     var order = await orders.New(request.CustomerId);
     return order;
 }

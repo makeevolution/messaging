@@ -34,7 +34,7 @@ public class OutboxWorker : BackgroundService
                 
                 foreach (var item in unprocessedOutboxItems)
                 {
-                    using var processingActivity = CreateActivity(item);
+                    using var instrumentor = InstrumentPublisher(item);
                     // using is very important, so that everytime we do an activity, the activity is stopped auto!
                     // Otherwise, OTEL will never process the activity (e.g. send to Jaeger) since the activity is never stopped!
                     // Having using is equivalent to the following:
@@ -52,7 +52,7 @@ public class OutboxWorker : BackgroundService
                     {
                         case nameof(OrderCreatedEventV1):
                         {
-                            processingActivity?.AddEvent(new ActivityEvent(
+                            instrumentor?.AddEvent(new ActivityEvent(
                                 $"Publishing data {item.EventData} to event bus"));
                                 // Publish the event
                                 var evt = JsonSerializer.Deserialize<OrderCreatedEventV1>(item.EventData);
@@ -62,8 +62,9 @@ public class OutboxWorker : BackgroundService
                                 break;
                             }
                         default:
-                            {
-                                _logger.LogInformation("Unknown event type '{EventType}'", item.EventType);
+                        {
+                            instrumentor?.AddEvent(
+                                new ActivityEvent($"Unknown event type '{item.EventType}'"));
                                 break;
                             }
                     }
@@ -76,14 +77,14 @@ public class OutboxWorker : BackgroundService
     
     /* Instrument the worker so that it is correlated in Jaeger with the request that wanted to publish the event.
      See Infrastructure.cs for more info on how this works*/
-    private Activity? CreateActivity(OutboxItem outboxItem)
+    private Activity? InstrumentPublisher(OutboxItem outboxItem)
     {
         if (!string.IsNullOrEmpty(outboxItem.TraceParent))
         {
             try
             {
                 var context = ActivityContext.Parse(outboxItem.TraceParent, null);  // Grab the parent
-                return _source.StartActivity("process", ActivityKind.Internal, context);
+                return _source.StartActivity(ActivityKind.Internal, context);
                 // Now OTEL has instrumented this worker, and it will show up correlated with the parent, in Jaeger.
             }
             catch (Exception ex)
