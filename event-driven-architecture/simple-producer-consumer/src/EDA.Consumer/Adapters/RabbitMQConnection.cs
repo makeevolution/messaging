@@ -32,7 +32,7 @@ public class RabbitMQConnection
         {
             try
             {
-                Console.WriteLine($"Attempting to connect to {hostName}");
+                Console.WriteLine($"Attempting to connect to host: {hostName}");
                 var factory = new ConnectionFactory()
                 {
                     HostName = hostName,
@@ -50,6 +50,7 @@ public class RabbitMQConnection
                 // See notes in Obsidian for more information.
                 channel.ExchangeDeclareAsync(exchange: exchangeName, ExchangeType.Topic, durable: true).GetAwaiter().GetResult();
                 channel.ExchangeDeclareAsync(exchange: deadLetterExchangeName, ExchangeType.Direct, durable: true).GetAwaiter().GetResult();
+                Console.WriteLine($"Successfully connected to host: {hostName}");
                 break;
             }
             catch (BrokerUnreachableException e)

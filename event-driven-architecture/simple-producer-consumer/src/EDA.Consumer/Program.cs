@@ -21,6 +21,7 @@ using EDA.Consumer.Core;
 using Shared;
 
 var builder = WebApplication.CreateBuilder(args);
+// Add JSON builder to add env.Environment to add appsettings.production
 
 builder.Services.AddMessaging(builder.Configuration);
 // Also need to add service to consume messages (i.e. OrderCreatedEventWorker)

@@ -50,12 +50,12 @@ public class OutboxWorker : BackgroundService
                     // If we access the activity through Activity.Current?, it will also nicely be automatically disposed!
                     switch (item.EventType)
                     {
-                        case nameof(OrderCreatedEvent):
+                        case nameof(OrderCreatedEventV1):
                         {
                             processingActivity?.AddEvent(new ActivityEvent(
                                 $"Publishing data {item.EventData} to event bus"));
                                 // Publish the event
-                                var evt = JsonSerializer.Deserialize<OrderCreatedEvent>(item.EventData);
+                                var evt = JsonSerializer.Deserialize<OrderCreatedEventV1>(item.EventData);
                                 await _eventPublisher.Publish(evt);
                                 item.Processed = true;
                                 dbService.Outbox.Update(item);

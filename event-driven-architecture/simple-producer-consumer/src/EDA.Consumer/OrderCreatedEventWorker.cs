@@ -17,7 +17,7 @@ public class OrderCreatedEventWorker : BackgroundService
 {
     const string QUEUE_NAME = "consumer-order-created";
     const string DEAD_LETTER_QUEUE_NAME = "consumer-order-created-dlq";
-    private const string ROUTING_KEY = "order-created";
+    private const string ROUTING_KEY = "order.orderCreated";
     private IChannel? _orderCreatedChannel;
     private HashSet<string> _processedEventIds = new();
     private readonly ActivitySource _source;
@@ -59,49 +59,77 @@ public class OrderCreatedEventWorker : BackgroundService
      this is the consumer */
     private async Task Consumer(object model, BasicDeliverEventArgs ea)
     {
-        var deliveryCount = 0;
-                
-        if (ea.BasicProperties.Headers != null && ea.BasicProperties.Headers["x-delivery-count"] != null)
-        {
-            deliveryCount = int.Parse(ea.BasicProperties.Headers["x-delivery-count"].ToString());
-        }
-            
-        _logger.LogInformation("Delivery count is {deliveryCount}", deliveryCount);
-            
+        var evtWrapper = await deserializeIncomingEvent(ea);
+
+        using var instrumentor = instrumentConsumer(evtWrapper);
+
+        var deliveryCount = obtainDeliveryCount(ea, instrumentor );
         try
         {
-            var body = ea.Body.ToArray();
-            var formatter = new JsonEventFormatter<OrderCreatedEvent>();
-            var evtWrapper = await formatter.DecodeStructuredModeMessageAsync(new MemoryStream(body), 
-                new ContentType("application/json"), new List<CloudEventAttribute>(0));
-            
+            //Console.WriteLine($"got message {ea.Body}");
             if (_processedEventIds.Contains(evtWrapper.Id))
             {
-                _logger.LogInformation("Event already processed. Skipping.");
+                instrumentor.AddEvent(new ActivityEvent("Event already processed. Skipping."));
                 await _orderCreatedChannel.BasicAckAsync(ea.DeliveryTag, false);
                 return;
             }
-            
-            // Get the traceparent from the event wrapper, and start an .NET Activity, so that this event consuming activity is correlated through OTEL!
-            var traceparent = evtWrapper.GetPopulatedAttributes()
-                .Where(attributeValue => attributeValue.Key.ToString() == "traceparent")
-                .Select(attributeValue => attributeValue.Value.ToString()).FirstOrDefault();
-            if (traceparent != null)
-            {
-                var context = ActivityContext.Parse(traceparent, null);  // parse the traceparent to a .NET context
-                using var processingActivity = _source.StartActivity("process222", ActivityKind.Internal, context);
-                
-            }
-            await _handler.Handle(evtWrapper.Data as OrderCreatedEvent);
+
+            await _handler.Handle(evtWrapper.Data as OrderCreatedEventV1);
             
             await _orderCreatedChannel.BasicAckAsync(ea.DeliveryTag, false);
             _processedEventIds.Add(evtWrapper.Id);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $" [x] Failure processing message. {ex.Message}");
+            instrumentor.AddException(new Exception($" [x] Failure processing message. {ex.Message}"));
                     
             await _orderCreatedChannel.BasicRejectAsync(ea.DeliveryTag, deliveryCount < 3);
         }
+    }
+
+    private Activity? instrumentConsumer(CloudEvent evtWrapper)
+    {
+        Activity? instrumentor = null;
+        try
+        {
+            // Start an .NET Activity
+            // Get the traceparent from the event wrapper so that this event consuming activity is correlated through OTEL!
+            // If the event doesn't (unexpectedly) have a traceparent, just start a new trace...
+            var traceparent = evtWrapper.GetPopulatedAttributes()
+                .Where(attributeValue => attributeValue.Key.ToString() == "traceparent")
+                .Select(attributeValue => attributeValue.Value.ToString()).FirstOrDefault();
+
+            instrumentor = traceparent != null
+                ? _source.StartActivity(nameof(OrderCreatedEventWorker), ActivityKind.Internal, ActivityContext.Parse(traceparent, null))
+                : _source.StartActivity(nameof(OrderCreatedEventWorker));
+            return instrumentor;
+        }
+        catch
+        {
+            instrumentor?.Dispose();
+            throw;
+        }
+    }
+
+    private static async Task<CloudEvent> deserializeIncomingEvent(BasicDeliverEventArgs ea)
+    {
+        var body = ea.Body.ToArray();
+        var formatter = new JsonEventFormatter<OrderCreatedEventV1>();
+        var evtWrapper = await formatter.DecodeStructuredModeMessageAsync(new MemoryStream(body), 
+            new ContentType("application/json"), new List<CloudEventAttribute>(0));
+        return evtWrapper;
+    }
+
+    private static int obtainDeliveryCount(BasicDeliverEventArgs ea, Activity? processingActivity)
+    {
+        var deliveryCount = 0;
+                
+        if (ea.BasicProperties.Headers != null && ea.BasicProperties.Headers["x-delivery-count"] != null)
+        {
+            deliveryCount = int.Parse(ea.BasicProperties.Headers["x-delivery-count"].ToString());
+        }
+
+        processingActivity?.AddEvent(new ActivityEvent($"Delivery count is {deliveryCount}"));
+        return deliveryCount;
     }
 }

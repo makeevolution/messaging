@@ -25,12 +25,11 @@ public class RabbitMQEventPublisher : IEventPublisher
         _rabbitMqSettings = settings.Value;
     }
     
-    public async Task Publish(OrderCreatedEvent evt)
+    public async Task Publish(OrderCreatedEventV1 evt)
     {
-        var eventName = "order-created";
+        var eventName = evt.EventName;
         var channel = await _connection.CreateChannelAsync();
         
-        //var body = JsonSerializer.SerializeToUtf8Bytes(evt);
         var evtWrapper = new CloudEvent
         {
             Type = eventName,

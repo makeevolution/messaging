@@ -36,7 +36,7 @@ builder.Services.AddGrpc();
 builder.Services
     .AddSharedInfrastructure(builder.Configuration, "PaymentApi")
     .AddAsyncApiDocs(builder.Configuration, [typeof(PaymentEventPublisher), typeof(RefundPaymentCommandHandler), typeof(TakePaymentCommandHandler)], "PaymentApi")
-    .AddCaching(builder.Configuration);
+    .AddCaching(builder.Configuration);  // caching to cache already processed events (for idempotency)
 
 builder.Services.AddSingleton<TakePaymentCommandHandler>();
 builder.Services.AddSingleton<RefundPaymentCommandHandler>();

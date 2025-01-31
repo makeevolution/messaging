@@ -36,10 +36,10 @@ public class PostgresOrders(OrdersDbContext context) : IOrders
         // if db save fails, no events are published, and vice versa.
         var orderOutbox = new OutboxItem() {
             Processed = false,
-            EventData = JsonSerializer.Serialize(new OrderCreatedEvent(){
+            EventData = JsonSerializer.Serialize(new OrderCreatedEventV1(){
                 OrderId = order.OrderId
             }), // save the event data in the database as a raw json string
-            EventType = nameof(OrderCreatedEvent)
+            EventType = nameof(OrderCreatedEventV1)
         };
 
         // Create a new order and outboxItem

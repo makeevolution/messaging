@@ -8,7 +8,7 @@ namespace Shared
     /* Extension method to apply shared infrastructure to all microservices */
     public static class Infrastructure
     {
-        private const string OTEL_DEFAULT_GRPC_ENDPOINT = "http://localhost:4317";
+        private const string OTEL_DEFAULT_GRPC_ENDPOINT = "http://localhost:4317"; //CHANGE TO JAEGER HOST FOR DOCKER!
         
         public static IServiceCollection AddSharedInfrastructure(this IServiceCollection services,
             IConfiguration configuration, string applicationName)

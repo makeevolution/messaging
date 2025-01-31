@@ -14,7 +14,7 @@ public static class ServiceExtensions
 
         if (hostName is null || exchangeName is null)
         {
-            throw new EventBusConnectionException("", "Host name is null");
+            throw new EventBusConnectionException("", "Host name or exchange name is null");
         }
         
         // Configure the DI container to add rabbit mq related services/implementations

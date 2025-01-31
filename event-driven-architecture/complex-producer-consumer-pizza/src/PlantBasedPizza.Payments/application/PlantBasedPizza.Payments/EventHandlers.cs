@@ -20,16 +20,18 @@ public static class EventHandlers
             {
                 try
                 {
+                    // Add OTEL tags to the event received; the event data is in the header of the request
                     var cloudEventId = ctx.ExtractEventId();
-                
+                    
+                    // Use the cloudEvent ID to implement idempotency
                     var cachedEvent = await cache.GetStringAsync($"events_{cloudEventId}");
-
                     if (cachedEvent != null)
                     {
                         Activity.Current?.AddTag("events.idempotent", "true");
                         return Results.Ok();
                     }
-                
+                    
+                    // The event is new; handle the event appropriately
                     var result = await handler.Handle(command);
 
                     if (!result)
@@ -37,6 +39,7 @@ public static class EventHandlers
                         return Results.InternalServerError();
                     }
 
+                    // Cache the handled event
                     await cache.SetStringAsync($"events_{cloudEventId}", "processed", new DistributedCacheEntryOptions()
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5),

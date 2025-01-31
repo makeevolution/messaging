@@ -11,6 +11,7 @@
     <PackageReference Include="RabbitMQ.Client" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\shared\shared.csproj" />
+    <ProjectReference Include="..\shared\EDA.Shared\shared.csproj" />
+    <ProjectReference Include="..\shared\EDA.Events\EDA.Events.csproj" />
   </ItemGroup>
 </Project>
