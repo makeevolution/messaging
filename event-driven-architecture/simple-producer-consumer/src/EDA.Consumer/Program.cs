@@ -18,6 +18,7 @@
 
 using EDA.Consumer;
 using EDA.Consumer.Core;
+using Serilog;
 using Shared;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +37,11 @@ builder.Services.AddTransient<OrderCreatedEventHandler>();
 // Add OTEL
 builder.Services.AddSharedInfrastructure(builder.Configuration, ApplicationDefaults.ServiceName);
 
+// Add Serilog
+// In the below, context: gives access to the application's configuration and environment settings
+// loggerConfig.ReadFrom.Configuration(context.Configuration) tells Serilog to read Serilog settings from the app's configuration
+builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 var app = builder.Build();
+app.UseSerilogRequestLogging();
 await app.RunAsync();
 

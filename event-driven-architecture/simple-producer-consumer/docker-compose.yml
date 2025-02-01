@@ -21,7 +21,7 @@ services:
     networks:
       - ankiai_network
     volumes:
-      - ./postgresconfig.json:/pgadmin4/servers.json  # Pre-configured servers
+      - ./.containers/postgres/postgresconfig.json:/pgadmin4/servers.json  # Pre-configured servers
     depends_on:
       - postgres  # Ensure PostgreSQL starts before pgAdmin
 
@@ -73,6 +73,20 @@ services:
       - ankiai_network
     depends_on:
       - rabbitmq
+  
+  ankiai.seq:
+    image: datalust/seq:latest
+    container_name: ankiai.Seq
+    volumes:
+      - ./.containers/seq:/data
+    environment:
+      - ACCEPT_EULA=Y
+    networks:
+      - ankiai_network
+    ports:
+      - 5341:5341
+      - 7272:80
+    
 
 networks:
   ankiai_network:
