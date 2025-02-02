@@ -13,9 +13,7 @@ public class OrderCreatedEventHandler(ILogger<OrderCreatedEventHandler> logger)
 {
     public async Task Handle(OrderCreatedEventV1 orderCreatedEventV1)
     {
-        // The below will produce a correct log, but string interpolation like below won't produce structured log
         logger.LogInformation($"Order {orderCreatedEventV1.OrderId} has been created");
-        // To produce structured logging, need to inject the value into the string like below
         logger.LogInformation("Order {orderId} will be processed shortly", orderCreatedEventV1.OrderId);
 
         if (orderCreatedEventV1.OrderId.StartsWith("6"))

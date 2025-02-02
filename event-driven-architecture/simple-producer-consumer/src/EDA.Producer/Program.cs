@@ -53,8 +53,8 @@ builder.Services.ConfigureDatabase(builder.Configuration);
 // Here we register the background service itself so it will actually run!
 builder.Services.AddHostedService<OutboxWorker>();
 
-// We add OpenTelemetry instrumentation here. See code in SharedInfrastructure for more information
-builder.Services.AddSharedInfrastructure(builder.Configuration, ApplicationDefaults.ServiceName);
+// We add monitoring related stuff here. See code in SharedInfrastructure for more information
+builder.Host.AddSharedInfrastructure(builder.Configuration, ApplicationDefaults.ServiceName);
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.

@@ -1,24 +1,33 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Serilog;
 
 namespace Shared
 {
     /* Extension method to apply shared infrastructure to all microservices */
     public static class Infrastructure
     {
-        private const string OTEL_DEFAULT_GRPC_ENDPOINT = "http://localhost:4317";
-        
-        public static IServiceCollection AddSharedInfrastructure(this IServiceCollection services,
+
+        /* Create an extension method to add Serilog and OTEL */
+        public static IHostBuilder AddSharedInfrastructure(this IHostBuilder hostBuilder,
             IConfiguration configuration, string applicationName)
         {
-            services.AddLogging();
+            // Since we use serilog, we can disable the below
+            // services.AddLogging();
+            
+            hostBuilder.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
-            ConfigureOpenTelemetry(services, configuration, applicationName);
-
-            services.AddHttpContextAccessor();
-            return services;
+            hostBuilder.ConfigureServices((context, services) =>
+            {
+                ConfigureOpenTelemetry(services, configuration, applicationName);
+                services.AddHttpContextAccessor();
+            });
+            return hostBuilder;
         }
         
         /* OpenTelemetry configuration */
@@ -94,6 +103,8 @@ namespace Shared
             
             // Everytime you do something with Activity e.g. Activity.Current?.AddEvent(new ActivityEvent("test123"));
             // It will be captured by OTEL. For example with AddEvent, it will be become a Log in Jaeger UI. Try it out.
+            // Now with Serilog, Seq and set up, all code that has an Activity.Current not being null, wil also have all
+            // logger.LogInformation(...) we do will be captured and correlated in Seq!
             
             // An API endpoint in .NET will have Activity.Current by default! So you don't need to do new
             // ActivitySource(); this is then also the reason how each endpoint is automatically instrumented by OTEL!
@@ -112,10 +123,19 @@ namespace Shared
                 // This is important! Otherwise any activity started by this source will return null (since there is no listener to it!)
                 tracing.AddSource(applicationName);
                 tracing.AddConsoleExporter();
-                tracing.AddOtlpExporter(otlpOptions =>
-                {
-                    otlpOptions.Endpoint = new Uri(configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? OTEL_DEFAULT_GRPC_ENDPOINT);
-                });
+                // Most important in configuring otlpExporter is to set the otel endpoint and the otel protocol
+                // These are set up through the environment variables OTEL_EXPORTER_OTLP_ENDPOINT and OTEL_EXPORTER_OTLP_PROTOCOL
+                // You can specify through the docker-compose, or through appsettings.json;
+                // Remember that the value in docker-compose wins!
+                // The below call will automatically read the env vars above and export telemetry data to the endpoint when
+                // an Activity ends.
+                tracing.AddOtlpExporter();
+                // The above is exactly the same as doing the below:
+                // tracing.AddOtlpExporter((otlpOptions) =>
+                // {
+                //    otlpOptions.Endpoint = new Uri(configuration.GetValue<string>("OTEL_EXPORTER_OTLP_ENDPOINT"));
+                //    otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+                // };
             });
         }
     }

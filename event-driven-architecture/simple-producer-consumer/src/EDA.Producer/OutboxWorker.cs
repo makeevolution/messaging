@@ -75,7 +75,7 @@ public class OutboxWorker : BackgroundService
         }
     }
     
-    /* Instrument the worker so that it is correlated in Jaeger with the request that wanted to publish the event.
+    /* Instrument the worker so that it is correlated  with the request that wanted to publish the event.
      See Infrastructure.cs for more info on how this works*/
     private Activity? InstrumentPublisher(OutboxItem outboxItem)
     {
@@ -84,8 +84,8 @@ public class OutboxWorker : BackgroundService
             try
             {
                 var context = ActivityContext.Parse(outboxItem.TraceParent, null);  // Grab the parent
-                return _source.StartActivity(ActivityKind.Internal, context);
-                // Now OTEL has instrumented this worker, and it will show up correlated with the parent, in Jaeger.
+                return _source.StartActivity($"Publish event: {outboxItem.EventType}", ActivityKind.Internal, context);
+                // Now OTEL has instrumented this worker, and it will show up correlated with the parent, in Jaeger or Seq or any dashboard actually.
             }
             catch (Exception ex)
             {

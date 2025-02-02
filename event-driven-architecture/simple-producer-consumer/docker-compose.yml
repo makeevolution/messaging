@@ -49,11 +49,11 @@ services:
     container_name: "local.eda-consumer"
     ports:
       - "5271:8080"
-    # For learning purposes: In ASP.NET, if you run using dll, the default
-    # ASPNETCORE_ENVIRONMNENT is Production! Commented out below just to reiterate
-    # the point
-    # environment:
-    #  - ASPNETCORE_ENVIRONMENT=Production
+    environment:
+      #  - ASPNETCORE_ENVIRONMENT=Production
+      # OTEL_EXPORTER_OTLP_ENDPOINT=http://ankiai.seq:4317 (uncomment if want to export to Jaeger)
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ankiai.seq:5341/ingest/otlp/v1/traces
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
     networks:
       - ankiai_network
     depends_on:
@@ -67,8 +67,12 @@ services:
     # For learning purposes: In ASP.NET, if you run using dll, the default
     # ASPNETCORE_ENVIRONMNENT is Production! Commented out below just to reiterate
     # the point
-    # environment:
-    #  - ASPNETCORE_ENVIRONMENT=Production
+    environment:
+      #  - ASPNETCORE_ENVIRONMENT=Production
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ankiai.seq:5341/ingest/otlp/v1/traces
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+
+
     networks:
       - ankiai_network
     depends_on:

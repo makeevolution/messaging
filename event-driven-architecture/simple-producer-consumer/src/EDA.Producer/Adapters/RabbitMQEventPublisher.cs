@@ -45,8 +45,13 @@ public class RabbitMQEventPublisher : IEventPublisher
 
         var json = evtFormatter.ConvertToJsonElement(evtWrapper).ToString();
         var body = Encoding.UTF8.GetBytes(json);
-        
-        Activity.Current?.AddEvent(new ActivityEvent($"Publishing to '{_rabbitMqSettings.ExchangeName}'"));
+
+        var msg = $"Publishing to '{_rabbitMqSettings.ExchangeName}'";
+        // The log msg below is a contrived example.
+        // If exporting to Jaeger, only AddEvent will show up there
+        // If exporting to Seq, both logger and AddEvent will show up!
+        Activity.Current?.AddEvent(new ActivityEvent(msg));
+        _logger.LogInformation(msg);
         
         await channel.BasicPublishAsync(exchange: _rabbitMqSettings.ExchangeName, routingKey: eventName, body: body);
     }
