@@ -122,12 +122,15 @@ public static class OrderEndpoints
                 return Results.Created();
             }
 
+            // The below will generate a ordersubmitted event, but it seems there's no listener for it; it seems
+            // it is just here for demo purposes
             var result = await handler.Handle(new SubmitOrderCommand
             {
                 OrderIdentifier = orderIdentifier,
                 CustomerIdentifier = accountId
             });
-
+            
+            // Then we also generate a take payment event simultaneously; for this one there is a listener indeed
             await paymentService.TakePayment(result.OrderIdentifier, result.TotalPrice);
 
             return Results.Created($"/order/{result?.OrderIdentifier}/detail", result);

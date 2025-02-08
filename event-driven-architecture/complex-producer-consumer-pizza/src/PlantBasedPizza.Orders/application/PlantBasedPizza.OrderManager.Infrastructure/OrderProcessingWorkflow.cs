@@ -38,9 +38,12 @@ public class OrderProcessingWorkflow : IOrderWorkflow
             await ProcessCancellation();
             return _currentStatus;
         }
-
+        
+        // The below will generate a ordersubmitted event, but it seems there's no listener for it; it seems
+        // it is just here for demo purposes
         await SubmitOrder();
-
+        
+        // Then we also generate a take payment event simultaneously; for this one there is a listener indeed
         await TakePayment();
 
         if (_orderCancelled)
@@ -182,7 +185,9 @@ public class OrderProcessingWorkflow : IOrderWorkflow
                     BackoffCoefficient = 2
                 }
             });
-
+        // After publishing take payment above; we wait, until, the ReceivePaymentFor WorkflowSignal above is triggered
+        // i.e. the WorkflowEngine receives a signal that the order is paid; this is done in PaymentSucessEventHandler.cs
+        // see the listener there for payments.paymentSuccessful; this event is sent by the payments API microservice!
         while (!_orderPaidFor) await Workflow.DelayAsync(TimeSpan.FromSeconds(2));
     }
 
