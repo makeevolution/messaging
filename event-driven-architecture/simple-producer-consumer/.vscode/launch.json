@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/EDA.Producer/bin/Debug/net9.0/EDA.Producer.dll",
+            "program": "${workspaceFolder}/src/Anko.OrdersService/bin/Debug/net9.0/Anko.OrdersService.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/EDA.Producer",
             "stopAtEntry": false,

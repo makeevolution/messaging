@@ -1,0 +1,100 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6BBCA265-8F96-414D-B804-17018BA49A55}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		src\Anko.PaymentsService\Adapters\EventBusConnectionException.cs = src\Anko.PaymentsService\Adapters\EventBusConnectionException.cs
+		src\Anko.PaymentsService\Adapters\RabbitMQConnection.cs = src\Anko.PaymentsService\Adapters\RabbitMQConnection.cs
+		src\Anko.PaymentsService\Adapters\RabbitMQSettings.cs = src\Anko.PaymentsService\Adapters\RabbitMQSettings.cs
+		src\Anko.PaymentsService\appsettings.Development.json = src\Anko.PaymentsService\appsettings.Development.json
+		src\Anko.PaymentsService\appsettings.json = src\Anko.PaymentsService\appsettings.json
+		src\Anko.PaymentsService\bin\Debug\net9.0\appsettings.Development.json = src\Anko.PaymentsService\bin\Debug\net9.0\appsettings.Development.json
+		src\Anko.PaymentsService\bin\Debug\net9.0\appsettings.json = src\Anko.PaymentsService\bin\Debug\net9.0\appsettings.json
+		src\Anko.PaymentsService\bin\Debug\net9.0\CloudNative.CloudEvents.dll = src\Anko.PaymentsService\bin\Debug\net9.0\CloudNative.CloudEvents.dll
+		src\Anko.PaymentsService\bin\Debug\net9.0\CloudNative.CloudEvents.SystemTextJson.dll = src\Anko.PaymentsService\bin\Debug\net9.0\CloudNative.CloudEvents.SystemTextJson.dll
+		src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.deps.json = src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.deps.json
+		src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.dll = src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.dll
+		src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.exe = src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.exe
+		src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.pdb = src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.pdb
+		src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.runtimeconfig.json = src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.runtimeconfig.json
+		src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.staticwebassets.endpoints.json = src\Anko.PaymentsService\bin\Debug\net9.0\Anko.PaymentsService.staticwebassets.endpoints.json
+		src\Anko.PaymentsService\bin\Debug\net9.0\RabbitMQ.Client.dll = src\Anko.PaymentsService\bin\Debug\net9.0\RabbitMQ.Client.dll
+		src\Anko.PaymentsService\Core\ExternalEvents\OrderCreatedEvent.cs = src\Anko.PaymentsService\Core\ExternalEvents\OrderCreatedEvent.cs
+		src\Anko.PaymentsService\Core\OrderCreatedEventHandler.cs = src\Anko.PaymentsService\Core\OrderCreatedEventHandler.cs
+		src\Anko.PaymentsService\Anko.PaymentsService.csproj = src\Anko.PaymentsService\Anko.PaymentsService.csproj
+		src\Anko.PaymentsService\obj\Debug\net9.0\.NETCoreApp,Version = v9.0.AssemblyAttributes.cs = src\Anko.PaymentsService\obj\Debug\net9.0\.NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+		src\Anko.PaymentsService\obj\Debug\net9.0\apphost.exe = src\Anko.PaymentsService\obj\Debug\net9.0\apphost.exe
+		src\Anko.PaymentsService\obj\Debug\net9.0\EDA.Cons.7A6EA1A7.Up2Date = src\Anko.PaymentsService\obj\Debug\net9.0\EDA.Cons.7A6EA1A7.Up2Date
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.AssemblyInfo.cs = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.AssemblyInfo.cs
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.AssemblyInfoInputs.cache = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.AssemblyInfoInputs.cache
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.assets.cache = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.assets.cache
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.csproj.AssemblyReference.cache = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.csproj.AssemblyReference.cache
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.csproj.CoreCompileInputs.cache = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.csproj.CoreCompileInputs.cache
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.csproj.FileListAbsolute.txt = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.csproj.FileListAbsolute.txt
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.dll = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.dll
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.GeneratedMSBuildEditorConfig.editorconfig = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.GeneratedMSBuildEditorConfig.editorconfig
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.genruntimeconfig.cache = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.genruntimeconfig.cache
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.GlobalUsings.g.cs = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.GlobalUsings.g.cs
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.MvcApplicationPartsAssemblyInfo.cache = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.MvcApplicationPartsAssemblyInfo.cache
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.pdb = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.pdb
+		src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.sourcelink.json = src\Anko.PaymentsService\obj\Debug\net9.0\Anko.PaymentsService.sourcelink.json
+		src\Anko.PaymentsService\obj\Debug\net9.0\ref\Anko.PaymentsService.dll = src\Anko.PaymentsService\obj\Debug\net9.0\ref\Anko.PaymentsService.dll
+		src\Anko.PaymentsService\obj\Debug\net9.0\refint\Anko.PaymentsService.dll = src\Anko.PaymentsService\obj\Debug\net9.0\refint\Anko.PaymentsService.dll
+		src\Anko.PaymentsService\obj\Debug\net9.0\staticwebassets\msbuild.build.Anko.PaymentsService.props = src\Anko.PaymentsService\obj\Debug\net9.0\staticwebassets\msbuild.build.Anko.PaymentsService.props
+		src\Anko.PaymentsService\obj\Debug\net9.0\staticwebassets\msbuild.buildMultiTargeting.Anko.PaymentsService.props = src\Anko.PaymentsService\obj\Debug\net9.0\staticwebassets\msbuild.buildMultiTargeting.Anko.PaymentsService.props
+		src\Anko.PaymentsService\obj\Debug\net9.0\staticwebassets\msbuild.buildTransitive.Anko.PaymentsService.props = src\Anko.PaymentsService\obj\Debug\net9.0\staticwebassets\msbuild.buildTransitive.Anko.PaymentsService.props
+		src\Anko.PaymentsService\obj\Debug\net9.0\staticwebassets.build.endpoints.json = src\Anko.PaymentsService\obj\Debug\net9.0\staticwebassets.build.endpoints.json
+		src\Anko.PaymentsService\obj\Debug\net9.0\staticwebassets.build.json = src\Anko.PaymentsService\obj\Debug\net9.0\staticwebassets.build.json
+		src\Anko.PaymentsService\obj\Anko.PaymentsService.csproj.nuget.dgspec.json = src\Anko.PaymentsService\obj\Anko.PaymentsService.csproj.nuget.dgspec.json
+		src\Anko.PaymentsService\obj\Anko.PaymentsService.csproj.nuget.g.props = src\Anko.PaymentsService\obj\Anko.PaymentsService.csproj.nuget.g.props
+		src\Anko.PaymentsService\obj\Anko.PaymentsService.csproj.nuget.g.targets = src\Anko.PaymentsService\obj\Anko.PaymentsService.csproj.nuget.g.targets
+		src\Anko.PaymentsService\obj\project.assets.json = src\Anko.PaymentsService\obj\project.assets.json
+		src\Anko.PaymentsService\obj\project.nuget.cache = src\Anko.PaymentsService\obj\project.nuget.cache
+		src\Anko.PaymentsService\obj\project.packagespec.json = src\Anko.PaymentsService\obj\project.packagespec.json
+		src\Anko.PaymentsService\obj\rider.project.model.nuget.info = src\Anko.PaymentsService\obj\rider.project.model.nuget.info
+		src\Anko.PaymentsService\obj\rider.project.restore.info = src\Anko.PaymentsService\obj\rider.project.restore.info
+		src\Anko.PaymentsService\OrderCreatedEventWorker.cs = src\Anko.PaymentsService\OrderCreatedEventWorker.cs
+		src\Anko.PaymentsService\Program.cs = src\Anko.PaymentsService\Program.cs
+		src\Anko.PaymentsService\Properties\launchSettings.json = src\Anko.PaymentsService\Properties\launchSettings.json
+		src\Anko.PaymentsService\ServiceExtensions.cs = src\Anko.PaymentsService\ServiceExtensions.cs
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anko.OrdersService", "src\Anko.OrdersService\Anko.OrdersService.csproj", "{0EF12E60-6BF6-4966-87D2-83DBD555641A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anko.PaymentsService", "src\Anko.PaymentsService\Anko.PaymentsService.csproj", "{68EC2848-B6C8-4397-AA06-5D6B792CA47B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anko.Shared", "src\shared\Anko.Shared\Anko.Shared.csproj", "{3037D39F-51B4-4E3D-99E9-5D1DBAB78B4B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anko.Events", "src\shared\Anko.Events\Anko.Events.csproj", "{72E611DA-9549-4F99-B9F5-76203B8F2E4A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0EF12E60-6BF6-4966-87D2-83DBD555641A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EF12E60-6BF6-4966-87D2-83DBD555641A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EF12E60-6BF6-4966-87D2-83DBD555641A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EF12E60-6BF6-4966-87D2-83DBD555641A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3037D39F-51B4-4E3D-99E9-5D1DBAB78B4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3037D39F-51B4-4E3D-99E9-5D1DBAB78B4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3037D39F-51B4-4E3D-99E9-5D1DBAB78B4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3037D39F-51B4-4E3D-99E9-5D1DBAB78B4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68EC2848-B6C8-4397-AA06-5D6B792CA47B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68EC2848-B6C8-4397-AA06-5D6B792CA47B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72E611DA-9549-4F99-B9F5-76203B8F2E4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72E611DA-9549-4F99-B9F5-76203B8F2E4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72E611DA-9549-4F99-B9F5-76203B8F2E4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72E611DA-9549-4F99-B9F5-76203B8F2E4A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0EF12E60-6BF6-4966-87D2-83DBD555641A} = {6BBCA265-8F96-414D-B804-17018BA49A55}
+	EndGlobalSection
+EndGlobal

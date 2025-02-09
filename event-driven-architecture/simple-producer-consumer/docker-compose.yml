@@ -7,7 +7,7 @@ services:
       - POSTGRES_PASSWORD=pass
       - POSTGRES_DB=mydb
     networks:
-      - ankiai_network
+      - ankoai_network
 
   # pgAdmin service (visualizer)
   pgadmin:
@@ -19,7 +19,7 @@ services:
     ports:
       - "5050:80"  # Expose the pgAdmin web interface
     networks:
-      - ankiai_network
+      - ankoai_network
     volumes:
       - ./.containers/postgres/postgresconfig.json:/pgadmin4/servers.json  # Pre-configured servers
     depends_on:
@@ -32,7 +32,7 @@ services:
       - "15672:15672"
       - "5672:5672"
     networks:
-      - ankiai_network
+      - ankoai_network
 
   jaeger:
     image: jaegertracing/opentelemetry-all-in-one:latest
@@ -42,26 +42,26 @@ services:
       - 4317:4317
       - 4318:4318
     networks:
-      - ankiai_network
+      - ankoai_network
   
-  local.consumer:
-    image: eda-consumer
-    container_name: "local.eda-consumer"
+  anko.paymentsservice:
+    image: anko.paymentsservice
+    container_name: "anko.paymentsservice"
     ports:
       - "5271:8080"
     environment:
       #  - ASPNETCORE_ENVIRONMENT=Production
-      # OTEL_EXPORTER_OTLP_ENDPOINT=http://ankiai.seq:4317 (uncomment if want to export to Jaeger)
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ankiai.seq:5341/ingest/otlp/v1/traces
+      # OTEL_EXPORTER_OTLP_ENDPOINT=http://ankoai.seq:4317 (uncomment if want to export to Jaeger)
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ankoai.seq:5341/ingest/otlp/v1/traces
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
     networks:
-      - ankiai_network
+      - ankoai_network
     depends_on:
       - rabbitmq
 
-  local.producer:
-    image: eda-producer
-    container_name: "local.eda-producer"
+  anko.ordersservice:
+    image: anko.ordersservice
+    container_name: "anko.ordersservice"
     ports:
       - "5093:8080"
     # For learning purposes: In ASP.NET, if you run using dll, the default
@@ -69,29 +69,29 @@ services:
     # the point
     environment:
       #  - ASPNETCORE_ENVIRONMENT=Production
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ankiai.seq:5341/ingest/otlp/v1/traces
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ankoai.seq:5341/ingest/otlp/v1/traces
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 
 
     networks:
-      - ankiai_network
+      - ankoai_network
     depends_on:
       - rabbitmq
   
-  ankiai.seq:
+  ankoai.seq:
     image: datalust/seq:latest
-    container_name: ankiai.Seq
+    container_name: ankoai.Seq
     volumes:
       - ./.containers/seq:/data
     environment:
       - ACCEPT_EULA=Y
     networks:
-      - ankiai_network
+      - ankoai_network
     ports:
       - 5341:5341
       - 7272:80
     
 
 networks:
-  ankiai_network:
+  ankoai_network:
     driver: bridge
