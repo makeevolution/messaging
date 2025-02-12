@@ -5,7 +5,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6BBCA265-8F96-414D-B804-17018BA49A55}"
 	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
 		src\Anko.PaymentsService\Adapters\EventBusConnectionException.cs = src\Anko.PaymentsService\Adapters\EventBusConnectionException.cs
 		src\Anko.PaymentsService\Adapters\RabbitMQConnection.cs = src\Anko.PaymentsService\Adapters\RabbitMQConnection.cs
 		src\Anko.PaymentsService\Adapters\RabbitMQSettings.cs = src\Anko.PaymentsService\Adapters\RabbitMQSettings.cs
