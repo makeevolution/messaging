@@ -1,7 +1,8 @@
 using Anko.OrdersService.Core;
+using Anko.OrdersService.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Anko.OrdersService.Adapters;
+namespace Anko.OrdersService.Infrastructure.Adapters.Database;
 
 public class OrdersDbContext : DbContext
 {

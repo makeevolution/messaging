@@ -3,8 +3,11 @@
 
 using System.Diagnostics;
 using Anko.OrdersService;
-using Anko.OrdersService.Adapters;
 using Anko.OrdersService.Core;
+using Anko.OrdersService.Core.Entities;
+using Anko.OrdersService.Infrastructure;
+using Anko.OrdersService.Infrastructure.Adapters.Database;
+using Anko.OrdersService.Workers;
 using Microsoft.EntityFrameworkCore;
 using Anko.Shared;
 

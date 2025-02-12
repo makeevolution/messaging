@@ -1,9 +1,11 @@
 using System.Text.Json;
 using Anko.OrdersService.Core;
+using Anko.OrdersService.Core.Entities;
+using Anko.OrdersService.Core.Events;
 
-namespace Anko.OrdersService.Adapters;
+namespace Anko.OrdersService.Infrastructure.Adapters.Database;
 
-public class PostgresOrders(OrdersDbContext context) : IOrders
+public class OrdersRepository(OrdersDbContext context) : IOrders
 {
     /* Handle new orders
      Note that the function is rigged; if the customerId is supplied as "error", then 

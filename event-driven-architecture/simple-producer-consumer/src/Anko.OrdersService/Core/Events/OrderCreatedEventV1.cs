@@ -1,6 +1,6 @@
 using Anko.Events;
 
-namespace Anko.OrdersService.Core;
+namespace Anko.OrdersService.Core.Events;
 
 public class OrderCreatedEventV1 : BaseEvent
 {

@@ -1,4 +1,4 @@
-namespace Anko.OrdersService.Adapters;
+namespace Anko.OrdersService.Infrastructure.Exceptions;
 
 public class EventBusConnectionException : Exception
 {

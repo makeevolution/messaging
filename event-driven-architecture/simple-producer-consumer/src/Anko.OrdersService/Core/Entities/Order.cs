@@ -1,4 +1,4 @@
-namespace Anko.OrdersService.Core;
+namespace Anko.OrdersService.Core.Entities;
 
 public class Order
 {

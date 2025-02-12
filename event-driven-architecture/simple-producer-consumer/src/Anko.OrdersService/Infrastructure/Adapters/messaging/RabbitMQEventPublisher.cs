@@ -1,13 +1,14 @@
 using System.Diagnostics;
 using System.Text;
-using System.Text.Json;
 using Anko.OrdersService.Core;
+using Anko.OrdersService.Core.Entities;
+using Anko.OrdersService.Core.Events;
 using CloudNative.CloudEvents;
 using CloudNative.CloudEvents.SystemTextJson;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 
-namespace Anko.OrdersService.Adapters;
+namespace Anko.OrdersService.Infrastructure.Adapters.Messaging;
 
 public class RabbitMQEventPublisher : IEventPublisher
 {

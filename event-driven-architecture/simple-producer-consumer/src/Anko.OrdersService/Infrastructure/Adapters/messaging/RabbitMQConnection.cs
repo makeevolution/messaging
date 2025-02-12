@@ -1,7 +1,8 @@
+using Anko.OrdersService.Infrastructure.Exceptions;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 
-namespace Anko.OrdersService.Adapters;
+namespace Anko.OrdersService.Infrastructure.Adapters.Messaging;
 
 public class RabbitMQConnection
 {

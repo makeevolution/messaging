@@ -1,4 +1,4 @@
-namespace Anko.OrdersService.Adapters;
+namespace Anko.OrdersService.Infrastructure.Adapters.Messaging;
 
 public class RabbitMqSettings
 {

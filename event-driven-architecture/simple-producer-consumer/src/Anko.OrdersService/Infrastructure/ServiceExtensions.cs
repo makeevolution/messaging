@@ -1,8 +1,11 @@
-using Anko.OrdersService.Adapters;
 using Anko.OrdersService.Core;
+using Anko.OrdersService.Core.Entities;
+using Anko.OrdersService.Infrastructure.Adapters.Database;
+using Anko.OrdersService.Infrastructure.Adapters.Messaging;
+using Anko.OrdersService.Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Anko.OrdersService;
+namespace Anko.OrdersService.Infrastructure;
 
 // Extension methods to extend IServiceCollection
 public static class ServiceExtensions
@@ -19,7 +22,7 @@ public static class ServiceExtensions
                 o => o
                     .SetPostgresVersion(17, 0)));
 
-        services.AddScoped<IOrders, PostgresOrders>();
+        services.AddScoped<IOrders, OrdersRepository>();
 
         return services;
     }

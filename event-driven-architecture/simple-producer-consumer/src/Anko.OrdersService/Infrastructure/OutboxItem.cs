@@ -1,9 +1,7 @@
 using System.Diagnostics;
-using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.Json;
 
-namespace Anko.OrdersService.Core;
+namespace Anko.OrdersService.Infrastructure;
 
 [PrimaryKey("Id")]
 public class OutboxItem

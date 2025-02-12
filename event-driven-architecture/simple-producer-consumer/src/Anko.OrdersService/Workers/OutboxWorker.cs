@@ -1,9 +1,12 @@
 using System.Diagnostics;
 using System.Text.Json;
-using Anko.OrdersService.Adapters;
 using Anko.OrdersService.Core;
+using Anko.OrdersService.Core.Entities;
+using Anko.OrdersService.Core.Events;
+using Anko.OrdersService.Infrastructure;
+using Anko.OrdersService.Infrastructure.Adapters.Database;
 
-namespace Anko.OrdersService;
+namespace Anko.OrdersService.Workers;
 
 // Create a tasks.py (background job) that will get outbox items from the db periodically and then publish the event
 public class OutboxWorker : BackgroundService
