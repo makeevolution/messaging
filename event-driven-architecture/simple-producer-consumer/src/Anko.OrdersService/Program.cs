@@ -10,6 +10,7 @@ using Anko.OrdersService.Infrastructure.Adapters.Database;
 using Anko.OrdersService.Workers;
 using Microsoft.EntityFrameworkCore;
 using Anko.Shared;
+using Temporalio.Api.TaskQueue.V1;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,9 @@ builder.Services.ConfigureDatabase(builder.Configuration);
 // The publishing itself will happen as a BackgroundService; see the code in OutboxWorker
 // Here we register the background service itself so it will actually run!
 builder.Services.AddHostedService<OutboxWorker>();
+
+// Add workflow engine (Temporalio)
+builder.Services.AddTemporalWorkflows(builder.Configuration);
 
 // We add monitoring related stuff here. See code in SharedInfrastructure for more information
 builder.Host.AddSharedInfrastructure(builder.Configuration, ApplicationDefaults.ServiceName);

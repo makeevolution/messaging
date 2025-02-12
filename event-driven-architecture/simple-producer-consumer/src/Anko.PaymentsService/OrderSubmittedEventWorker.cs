@@ -13,19 +13,19 @@ using Microsoft.Extensions.Options;
 
 namespace Anko.PaymentsService;
 
-public class OrderCreatedEventWorker : BackgroundService
+public class orderSubmittedEventWorker : BackgroundService
 {
-    const string QUEUE_NAME = "consumer-order-created";
-    const string DEAD_LETTER_QUEUE_NAME = "consumer-order-created-dlq";
-    private const string ROUTING_KEY = "order.orderCreated";
-    private IChannel? _orderCreatedChannel;
+    const string QUEUE_NAME = "consumer-order-submitted";
+    const string DEAD_LETTER_QUEUE_NAME = "consumer-order-submitted-dlq";
+    private const string ROUTING_KEY = "order.orderSubmitted";
+    private IChannel? _orderSubmittedChannel;
     private HashSet<string> _processedEventIds = new();
     private readonly ActivitySource _source;
-    private readonly OrderCreatedEventHandler _handler;
+    private readonly orderSubmittedEventHandler _handler;
     private readonly IOptions<RabbitMqSettings> _settings;
-    private readonly ILogger<OrderCreatedEventWorker> _logger;
+    private readonly ILogger<orderSubmittedEventWorker> _logger;
     private readonly RabbitMQConnection _connection;
-    public OrderCreatedEventWorker(OrderCreatedEventHandler handler, IOptions<RabbitMqSettings> settings, ILogger<OrderCreatedEventWorker> logger, RabbitMQConnection connection)
+    public orderSubmittedEventWorker(orderSubmittedEventHandler handler, IOptions<RabbitMqSettings> settings, ILogger<orderSubmittedEventWorker> logger, RabbitMQConnection connection)
     {
         _handler = handler;
         _settings = settings;
@@ -44,11 +44,11 @@ public class OrderCreatedEventWorker : BackgroundService
         var channelConfiguration = new ChannelConfig(_settings.Value.ExchangeName, 
             QUEUE_NAME, ROUTING_KEY, _settings.Value.DeadLetterExchangeName, DEAD_LETTER_QUEUE_NAME, Consumer);
         var configuredChannel = await _connection.CreateAndConfigureConsumingChannel(channelConfiguration, stoppingToken);
-        _orderCreatedChannel = configuredChannel.Channel;
+        _orderSubmittedChannel = configuredChannel.Channel;
         
         while (!stoppingToken.IsCancellationRequested)
         {
-            await _orderCreatedChannel.BasicConsumeAsync(QUEUE_NAME, false, configuredChannel.Consumer, 
+            await _orderSubmittedChannel.BasicConsumeAsync(QUEUE_NAME, false, configuredChannel.Consumer, 
                 cancellationToken: stoppingToken);
             
             await Task.Delay(1000, stoppingToken);
@@ -70,23 +70,23 @@ public class OrderCreatedEventWorker : BackgroundService
             if (_processedEventIds.Contains(evtWrapper.Id))
             {
                 instrumentor.AddEvent(new ActivityEvent("Event already processed. Skipping."));
-                await _orderCreatedChannel.BasicAckAsync(ea.DeliveryTag, false);
+                await _orderSubmittedChannel.BasicAckAsync(ea.DeliveryTag, false);
                 return;
             }
 
-            var eventData = evtWrapper.Data as OrderCreatedEventV1;
+            var eventData = evtWrapper.Data as OrderSubmittedEventV1;
             eventData.AddToTelemetry(evtWrapper.Id);
 
             await _handler.Handle(eventData);
             
-            await _orderCreatedChannel.BasicAckAsync(ea.DeliveryTag, false);
+            await _orderSubmittedChannel.BasicAckAsync(ea.DeliveryTag, false);
             _processedEventIds.Add(evtWrapper.Id);
         }
         catch (Exception ex)
         {
             instrumentor.AddException(ex);
                     
-            await _orderCreatedChannel.BasicRejectAsync(ea.DeliveryTag, deliveryCount < 3);
+            await _orderSubmittedChannel.BasicRejectAsync(ea.DeliveryTag, deliveryCount < 3);
         }
     }
 
@@ -103,8 +103,8 @@ public class OrderCreatedEventWorker : BackgroundService
                 .Select(attributeValue => attributeValue.Value.ToString()).FirstOrDefault();
 
             instrumentor = traceparent != null
-                ? _source.StartActivity(nameof(OrderCreatedEventWorker), ActivityKind.Internal, ActivityContext.Parse(traceparent, null))
-                : _source.StartActivity(nameof(OrderCreatedEventWorker));
+                ? _source.StartActivity(nameof(orderSubmittedEventWorker), ActivityKind.Internal, ActivityContext.Parse(traceparent, null))
+                : _source.StartActivity(nameof(orderSubmittedEventWorker));
             return instrumentor;
         }
         catch
@@ -117,7 +117,7 @@ public class OrderCreatedEventWorker : BackgroundService
     private static async Task<CloudEvent> DeserializeIncomingEvent(BasicDeliverEventArgs ea)
     {
         var body = ea.Body.ToArray();
-        var formatter = new JsonEventFormatter<OrderCreatedEventV1>();
+        var formatter = new JsonEventFormatter<OrderSubmittedEventV1>();
         var evtWrapper = await formatter.DecodeStructuredModeMessageAsync(new MemoryStream(body), 
             new ContentType("application/json"), null);
         return evtWrapper;

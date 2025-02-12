@@ -93,7 +93,7 @@ public class RabbitMQConnection
         
         await channel.QueueBindAsync(queue: config.DeadLetterQueueName, exchange: config.DeadLetterExchangeName, routingKey: config.RoutingKey, cancellationToken: stoppingToken);
         
-        // Second, declare the queue that listens for order created events
+        // Second, declare the queue that listens for order submitted events
         // Note that it has the dead letter arguments; i.e. messages that can't be handled due to an error will be put into that queue.
         // The queue is also set to quorum for durability (refer to docs for more info)
         await channel.QueueDeclareAsync(config.QueueName,

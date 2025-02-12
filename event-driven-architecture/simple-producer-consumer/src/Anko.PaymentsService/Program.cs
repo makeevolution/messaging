@@ -25,14 +25,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add JSON builder to add env.Environment to add appsettings.production
 
 builder.Services.AddMessaging(builder.Configuration);
-// Also need to add service to consume messages (i.e. OrderCreatedEventWorker)
+// Also need to add service to consume messages (i.e. orderSubmittedEventWorker)
 // It will run as a BackgroundService
-builder.Services.AddHostedService<OrderCreatedEventWorker>();
-// If you see OrderCreatedEventWorker above, you will see that it needs an OrderCreatedEventHandler!
+builder.Services.AddHostedService<orderSubmittedEventWorker>();
+// If you see orderSubmittedEventWorker above, you will see that it needs an orderSubmittedEventHandler!
 // To register that specific implementation, since we are not using ASP.NET here (i.e. no HTTP requests),
 // can only either register the service as a singleton or transient. Just choose singleton to save
 // performance cost of recreating a new handler everytime we call.
-builder.Services.AddTransient<OrderCreatedEventHandler>();
+builder.Services.AddTransient<orderSubmittedEventHandler>();
 
 // Add OTEL
 builder.Host.AddSharedInfrastructure(builder.Configuration, ApplicationDefaults.ServiceName);
