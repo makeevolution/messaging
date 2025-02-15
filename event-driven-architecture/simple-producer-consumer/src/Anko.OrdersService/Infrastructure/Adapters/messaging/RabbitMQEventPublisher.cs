@@ -25,7 +25,7 @@ public class RabbitMQEventPublisher : IEventPublisher
         _rabbitMqSettings = settings.Value;
     }
     
-    public async Task Publish(OrderCreatedEventV1 evt)
+    public async Task Publish(OrderSubmittedEventV1 evt)
     {
         var eventName = evt.EventName;
         var channel = await _connection.CreateChannelAsync();

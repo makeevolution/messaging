@@ -53,12 +53,11 @@ public class OutboxWorker : BackgroundService
                     // If we access the activity through Activity.Current?, it will also nicely be automatically disposed!
                     switch (item.EventType)
                     {
-                        case nameof(OrderCreatedEventV1):
+                        case nameof(OrderSubmittedEventV1):
                         {
-                            instrumentor?.AddEvent(new ActivityEvent(
-                                $"Publishing data {item.EventData} to event bus"));
+                            instrumentor?.AddEvent(new ActivityEvent($"Publishing data {item.EventData} to event bus"));
                                 // Publish the event
-                                var evt = JsonSerializer.Deserialize<OrderCreatedEventV1>(item.EventData);
+                                var evt = JsonSerializer.Deserialize<OrderSubmittedEventV1>(item.EventData);
                                 await _eventPublisher.Publish(evt);
                                 item.Processed = true;
                                 dbService.Outbox.Update(item);
@@ -66,9 +65,8 @@ public class OutboxWorker : BackgroundService
                             }
                         default:
                         {
-                            instrumentor?.AddEvent(
-                                new ActivityEvent($"Unknown event type '{item.EventType}'"));
-                                break;
+                            instrumentor?.AddException(new Exception($"Unknown event type '{item.EventType}'"));
+                            break;
                             }
                     }
                 }

@@ -4,5 +4,5 @@ namespace Anko.OrdersService.Core.Entities;
 
 public interface IEventPublisher
 {
-    Task Publish(OrderCreatedEventV1 evt);
+    Task Publish(OrderSubmittedEventV1 evt);
 }

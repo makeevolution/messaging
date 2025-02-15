@@ -22,7 +22,7 @@ public static class ServiceExtensions
                 o => o
                     .SetPostgresVersion(17, 0)));
 
-        services.AddScoped<IOrders, OrdersRepository>();
+        services.AddScoped<IOrdersRepository, OrdersRepository>();
 
         return services;
     }

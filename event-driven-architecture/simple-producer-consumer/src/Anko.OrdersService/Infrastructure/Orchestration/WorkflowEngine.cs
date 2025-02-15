@@ -1,20 +1,29 @@
+using Anko.OrdersService.Core.Entities;
 using Anko.OrdersService.Core.Services;
+using Anko.OrdersService.Infrastructure.Adapters.Database;
 using Anko.OrdersService.Infrastructure.WorkflowEngine;
+using Microsoft.EntityFrameworkCore;
 using Temporalio.Client;
+using Temporalio.Common;
 
 namespace Anko.OrdersService.Infrastructure.Orchestration;
 
-public class WorkflowEngine(ITemporalClient client, IOrderRepository orderRepository) : IWorkflowEngine
+public class WorkflowEngine(ITemporalClient client, IServiceProvider serviceProvider) : IWorkflowEngine
 {
-    public async Task StartOrderWorkflowFor(string orderIdentifier)
+    public async Task StartOrderWorkflowFor(string orderId)
     {
-        var order = await orderRepository.Retrieve(orderIdentifier);
-
-        if (order is null) return;
+        using var scope = serviceProvider.CreateScope();
+        var orderContext = scope.ServiceProvider.GetRequiredService<OrdersDbContext>();
+        var order2 =  await orderContext.Orders.FirstOrDefaultAsync(ordr => ordr.Id == orderId);
+        var order = new Order();
+        if (order is null)
+        {
+            throw new Exception($"Order {orderId} not found");
+        };
 
         await client.StartWorkflowAsync(
-            (OrderProcessingWorkflow wf) => wf.RunAsync(new OrderDto(order)),
-            new WorkflowOptions(generateWorkflowIdFor(orderIdentifier), "orders-queue")
+            (OrderProcessingWorkflow wf) => wf.RunWorkflow(order),
+            new WorkflowOptions(generateWorkflowIdFor(orderId), "orders-queue")
             {
                 RetryPolicy = new RetryPolicy
                 {
@@ -24,6 +33,6 @@ public class WorkflowEngine(ITemporalClient client, IOrderRepository orderReposi
                 }
             });
     }
-    private static string generateWorkflowIdFor(string orderIdentifier) => $"OrderProcessing_{orderIdentifier}";
+    private static string generateWorkflowIdFor(string orderId) => $"OrderProcessing_{orderId}";
 
 }

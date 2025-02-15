@@ -1,11 +1,11 @@
 using System.Text.Json;
-using Anko.OrdersService.Core;
 using Anko.OrdersService.Core.Entities;
 using Anko.OrdersService.Core.Events;
+using Microsoft.EntityFrameworkCore;
 
 namespace Anko.OrdersService.Infrastructure.Adapters.Database;
 
-public class OrdersRepository(OrdersDbContext context) : IOrders
+public class OrdersRepository(OrdersDbContext context) : IOrdersRepository
 {
     /* Handle new orders
      Note that the function is rigged; if the customerId is supplied as "error", then 
@@ -23,36 +23,43 @@ public class OrdersRepository(OrdersDbContext context) : IOrders
      transactions that ensure event publishing and db write is all-or-nothing.
      
      */
-    public async Task<Order> New(string customerId)
+    public async Task<Order> Submit(string orderId)
     {
         // Create a transaction and only commit later
+        
         var transaction = await context.Database.BeginTransactionAsync();
 
-        var order = new Order()
-        {
-            CustomerId = customerId,
+        // Find the order to be submitted, change its state and then create the outboxItem
 
-            OrderId = customerId == "error" ? $"6{Guid.NewGuid().ToString()}" : Guid.NewGuid().ToString()
-        };
+        var order = await RetrieveOrder(orderId);
+
         // With an outbox storing the event to be published in db before publishing, we are sure that the
         // if db save fails, no events are published, and vice versa.
         var orderOutbox = new OutboxItem() {
             Processed = false,
-            EventData = JsonSerializer.Serialize(new OrderCreatedEventV1(){
-                OrderId = order.OrderId
+            EventData = JsonSerializer.Serialize(new OrderSubmittedEventV1(){
+                OrderId = order.Id
             }), // save the event data in the database as a raw json string
-            EventType = nameof(OrderCreatedEventV1)
+            EventType = nameof(OrderSubmittedEventV1)
         };
 
-        // Create a new order and outboxItem
-
-        await context.Orders.AddAsync(order);
+        order.Submitted = true;
         await context.Outbox.AddAsync(orderOutbox);
         
         // Commit together, ensuring atomicity
         await context.SaveChangesAsync();
         await transaction.CommitAsync();
 
+        return order;
+    }
+
+    public async Task<Order> RetrieveOrder(string orderId)
+    {
+        var order = await context.Orders.FirstOrDefaultAsync(ordr => ordr.Id == orderId);
+        if (order == null)
+        {
+            throw new Exception($"Order with id {orderId} not found!");
+        }
         return order;
     }
 }

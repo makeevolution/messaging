@@ -5,12 +5,14 @@ using System.Diagnostics;
 using Anko.OrdersService;
 using Anko.OrdersService.Core;
 using Anko.OrdersService.Core.Entities;
+using Anko.OrdersService.Core.Services;
 using Anko.OrdersService.Infrastructure;
 using Anko.OrdersService.Infrastructure.Adapters.Database;
 using Anko.OrdersService.Workers;
 using Microsoft.EntityFrameworkCore;
 using Anko.Shared;
-using Temporalio.Api.TaskQueue.V1;
+using Microsoft.AspNetCore.Mvc;
+using Temporalio.Extensions.OpenTelemetry;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Services is an IServiceCollection which will contain services that can be resolved by the DI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 // Where does ConfigureMessaging and ConfigureDatabase services below come from???
 // They come from implementing extension methods feature of .NET
 // In your project code, where ever you define a static class and a static method that accepts an interface as 'this' argument e.g.:
@@ -42,7 +45,7 @@ builder.Services.AddSwaggerGen();
 //                 o => o
 //                     .SetPostgresVersion(17, 0)));
 
-//         services.AddScoped<IOrders, PostgresOrders>();
+//         services.AddScoped<IOrdersRepository, PostgresOrders>();
 
 //         return services;
 //     }
@@ -57,11 +60,13 @@ builder.Services.ConfigureDatabase(builder.Configuration);
 // Here we register the background service itself so it will actually run!
 builder.Services.AddHostedService<OutboxWorker>();
 
-// Add workflow engine (Temporalio)
-builder.Services.AddTemporalWorkflows(builder.Configuration);
-
 // We add monitoring related stuff here. See code in SharedInfrastructure for more information
 builder.Host.AddSharedInfrastructure(builder.Configuration, ApplicationDefaults.ServiceName);
+
+
+// Add workflow and its engine (Temporalio)
+builder.Services.ConfigureTemporalEngine(builder.Configuration);
+builder.Services.AddTemporalWorkflows(builder.Configuration);
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
@@ -81,22 +86,31 @@ using (var scope = serviceScopeFactory.CreateScope())
     await dbContext.Database.MigrateAsync();
 }
 
+
 app.MapGet("/health", HandleHealthCheck)
 .WithName("HealthCheck")
 .WithOpenApi();
 
-app.MapPost("/orders", HandleCreateOrder)
-    .WithName("CreateOrder")
+app.MapPost("/orders", HandleSubmitOrder)
+    .WithName("SubmitOrder")
     .WithOpenApi();
 
 await app.RunAsync();
 
 // The arguments below that are interfaces, are injected by the DI framework
-static async Task<Order> HandleCreateOrder(CreateOrderRequest request, IOrders orders, IEventPublisher events)
+static async Task<IResult> HandleSubmitOrder(SubmitOrderRequest request, IOrdersRepository orders, [FromServices] IWorkflowEngine workflowEngine)
 {
-    // Create new order for customer in db
-    var order = await orders.New(request.CustomerId);
-    return order;
+    // Submit new order
+    if (true)
+    {
+        await workflowEngine.StartOrderWorkflowFor(request.OrderId);
+    }
+    else
+    {
+        await orders.Submit(request.OrderId);
+    }
+
+    return Results.Created();
 }
 
 static async Task<string> HandleHealthCheck(OrdersDbContext context)

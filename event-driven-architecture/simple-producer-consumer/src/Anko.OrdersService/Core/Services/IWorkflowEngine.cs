@@ -3,7 +3,7 @@ namespace Anko.OrdersService.Core.Services;
 
 public interface IWorkflowEngine
 {
-    Task StartOrderWorkflowFor(string orderIdentifier);
+    Task StartOrderWorkflowFor(string orderId);
 
     // Task ConfirmPayment(string orderIdentifier, decimal paymentAmount);
     //
