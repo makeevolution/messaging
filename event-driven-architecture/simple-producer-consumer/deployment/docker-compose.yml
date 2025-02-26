@@ -45,7 +45,7 @@ services:
       - ankoai_network
   
   anko.paymentsservice:
-    image: anko.paymentsservice
+    image: aldosebastian/anko.paymentsservice
     container_name: "anko.paymentsservice"
     ports:
       - "5271:8080"
@@ -60,7 +60,7 @@ services:
       - rabbitmq
 
   anko.ordersservice:
-    image: anko.ordersservice
+    image: aldosebastian/anko.ordersservice
     container_name: "anko.ordersservice"
     ports:
       - "5093:8080"

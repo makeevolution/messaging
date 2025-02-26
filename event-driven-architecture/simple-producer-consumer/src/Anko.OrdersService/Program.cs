@@ -101,7 +101,7 @@ await app.RunAsync();
 static async Task<IResult> HandleSubmitOrder(SubmitOrderRequest request, IOrdersRepository orders, [FromServices] IWorkflowEngine workflowEngine)
 {
     // Submit new order
-    if (true)
+    if (bool.TryParse(Environment.GetEnvironmentVariable("USE_ORCHESTRATION"), out bool result) && result)
     {
         await workflowEngine.StartOrderWorkflowFor(request.OrderId);
     }

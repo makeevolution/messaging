@@ -85,6 +85,7 @@ public class orderSubmittedEventWorker : BackgroundService
         catch (Exception ex)
         {
             instrumentor.AddException(ex);
+            _logger.LogError(ex, ex.Message);
                     
             await _orderSubmittedChannel.BasicRejectAsync(ea.DeliveryTag, deliveryCount < 3);
         }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Anko.OrdersService.Infrastructure.Adapters.Database;
 
-public class OrdersRepository(OrdersDbContext context) : IOrdersRepository
+public class OrdersRepository(OrdersDbContext context, ILogger<OrdersRepository> logger) : IOrdersRepository
 {
     /* Handle new orders
      Note that the function is rigged; if the customerId is supplied as "error", then 
@@ -58,7 +58,8 @@ public class OrdersRepository(OrdersDbContext context) : IOrdersRepository
         var order = await context.Orders.FirstOrDefaultAsync(ordr => ordr.Id == orderId);
         if (order == null)
         {
-            throw new Exception($"Order with id {orderId} not found!");
+            logger.LogInformation($"Order with id: '{orderId}' not found! Generating a random order with random data for temporary demo purposes");
+            order = new Order(){Id = Guid.NewGuid().ToString()};
         }
         return order;
     }
