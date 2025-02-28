@@ -91,11 +91,17 @@ app.MapGet("/health", HandleHealthCheck)
 .WithName("HealthCheck")
 .WithOpenApi();
 
-app.MapPost("/orders", HandleSubmitOrder)
+// app.MapPost("/orders/create", HandleCreateOrder)
+//     .WithName("CreateOrder")
+//     .WithOpenApi();
+
+app.MapPost("/orders/submit", HandleSubmitOrder)
     .WithName("SubmitOrder")
     .WithOpenApi();
 
 await app.RunAsync();
+
+
 
 // The arguments below that are interfaces, are injected by the DI framework
 static async Task<IResult> HandleSubmitOrder(SubmitOrderRequest request, IOrdersRepository orders, [FromServices] IWorkflowEngine workflowEngine)

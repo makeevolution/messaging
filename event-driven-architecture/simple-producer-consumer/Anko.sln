@@ -69,6 +69,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anko.Shared", "src\shared\A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anko.Events", "src\shared\Anko.Events\Anko.Events.csproj", "{72E611DA-9549-4F99-B9F5-76203B8F2E4A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anko.WarehouseService", "src\Anko.WarehouseService\application\Anko.WarehouseService.Api\Anko.WarehouseService.csproj", "{F3F6A2F4-1966-496F-807E-D8C6B7AB0589}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anko.WarehouseService.Core", "src\Anko.WarehouseService\application\Anko.WarehouseService.Core\Anko.WarehouseService.Core.csproj", "{159F44D2-2A90-4695-B627-24BB460E2ACC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anko.WarehouseService.Infrastructure", "src\Anko.WarehouseService\application\Anko.WarehouseService.Infrastructure\Anko.WarehouseService.Infrastructure.csproj", "{79C0E4D1-5846-4DB1-A46B-B3A068CD86D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anko.WarehouseService", "src\Anko.WarehouseService\application\Anko.WarehouseService.Api\Anko.WarehouseService.csproj", "{07D7E91E-5C64-407A-9290-7A5DF965375E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +100,26 @@ Global
 		{72E611DA-9549-4F99-B9F5-76203B8F2E4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72E611DA-9549-4F99-B9F5-76203B8F2E4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72E611DA-9549-4F99-B9F5-76203B8F2E4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0951433-4EBE-4723-B04C-10EF0F9320F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0951433-4EBE-4723-B04C-10EF0F9320F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0951433-4EBE-4723-B04C-10EF0F9320F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0951433-4EBE-4723-B04C-10EF0F9320F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3F6A2F4-1966-496F-807E-D8C6B7AB0589}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3F6A2F4-1966-496F-807E-D8C6B7AB0589}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3F6A2F4-1966-496F-807E-D8C6B7AB0589}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3F6A2F4-1966-496F-807E-D8C6B7AB0589}.Release|Any CPU.Build.0 = Release|Any CPU
+		{159F44D2-2A90-4695-B627-24BB460E2ACC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{159F44D2-2A90-4695-B627-24BB460E2ACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{159F44D2-2A90-4695-B627-24BB460E2ACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{159F44D2-2A90-4695-B627-24BB460E2ACC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79C0E4D1-5846-4DB1-A46B-B3A068CD86D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79C0E4D1-5846-4DB1-A46B-B3A068CD86D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79C0E4D1-5846-4DB1-A46B-B3A068CD86D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79C0E4D1-5846-4DB1-A46B-B3A068CD86D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07D7E91E-5C64-407A-9290-7A5DF965375E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07D7E91E-5C64-407A-9290-7A5DF965375E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07D7E91E-5C64-407A-9290-7A5DF965375E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07D7E91E-5C64-407A-9290-7A5DF965375E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0EF12E60-6BF6-4966-87D2-83DBD555641A} = {6BBCA265-8F96-414D-B804-17018BA49A55}

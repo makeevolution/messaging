@@ -1,4 +1,3 @@
-using Anko.OrdersService.Core;
 using Anko.OrdersService.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
