@@ -25,7 +25,7 @@ app.UseRouting();
 
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapItemsEndpoints();
+    _ = endpoints.MapItemsEndpoints();
 });
 var itemsRepo = app.Services.GetRequiredService<IItemsRepository>();
 await itemsRepo.SeedItemsAsync();
