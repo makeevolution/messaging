@@ -1,0 +1,6 @@
+@Anko.WarehouseService_HostAddress = http://localhost:5065
+
+GET {{Anko.WarehouseService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
