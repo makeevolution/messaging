@@ -34,7 +34,7 @@ builder.Services.AddHostedService<orderSubmittedEventWorker>();
 // performance cost of recreating a new handler everytime we call.
 builder.Services.AddTransient<orderSubmittedEventHandler>();
 
-// Add OTEL
+// Add shared infrastructure
 builder.Host.AddSharedInfrastructure(builder.Configuration, ApplicationDefaults.ServiceName);
 
 var app = builder.Build();

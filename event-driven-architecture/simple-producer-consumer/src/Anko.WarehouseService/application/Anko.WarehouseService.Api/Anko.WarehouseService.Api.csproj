@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\shared\Anko.Shared\Anko.Shared.csproj" />
     <ProjectReference Include="..\Anko.WarehouseService.Core\Anko.WarehouseService.Core.csproj" />
     <ProjectReference Include="..\Anko.WarehouseService.Infrastructure\Anko.WarehouseService.Infrastructure.csproj" />
   </ItemGroup>

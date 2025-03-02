@@ -19,7 +19,11 @@ import { ApiService } from 'src/app/services/api.service';
   styleUrl: './view-all-items.component.css'
 })
 export class ViewAllItemsComponent implements OnInit {
+
+  // Properties required for the table component, see html file for where these are used
   items: TableContent[] = []
+  viewAllItemsColumns: string[] = ['name', 'category', 'price'];
+
 
   constructor(
     private apiService: ApiService

@@ -6,7 +6,7 @@ using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
-
+using Anko.Shared.Authentication;
 namespace Anko.Shared
 {
     /* Extension method to apply shared infrastructure to all microservices */
@@ -21,13 +21,29 @@ namespace Anko.Shared
             // services.AddLogging();
             
             hostBuilder.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
-
+            
             hostBuilder.ConfigureServices((context, services) =>
             {
                 ConfigureOpenTelemetry(services, configuration, applicationName);
+                ConfigureCORSPolicies(services);
                 services.AddHttpContextAccessor();
             });
             return hostBuilder;
+        }
+        
+        /* Customize CORS policies that can be used after app.run() */
+        private static void ConfigureCORSPolicies(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: CorsSettings.ALLOW_ALL_POLICY_NAME,
+                    policy  =>
+                    {
+                        policy.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
         }
         
         /* OpenTelemetry configuration */

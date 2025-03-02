@@ -1,3 +1,6 @@
+using Anko.Shared;
+using Anko.Shared.Authentication;
+using Anko.WarehouseService;
 using Anko.WarehouseService.Api.Endpoints;
 using Anko.WarehouseService.Api.Endpoints.Items;
 using Anko.WarehouseService.Core.Repositories;
@@ -9,19 +12,11 @@ builder.Services.AddSingleton<IItemsRepository, ItemsRepository>();
 builder.Services.AddSwaggerGen();
 builder.Services.AddEndpointsApiExplorer();
 
-// Add shared infrastructure
+// Add warehouse-specific infrastructure, and also shared infrastructure
 builder.Services.AddWarehouseInfrastructure(builder.Configuration);
+builder.Host.AddSharedInfrastructure(builder.Configuration, ApplicationDefaults.ServiceName);
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: "AllowAll",
-                      policy  =>
-                      {
-                            policy.AllowAnyOrigin()
-                                    .AllowAnyMethod()
-                                    .AllowAnyHeader();
-                      });
-});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,7 +25,8 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseCors("AllowAll");
+// Add CORS policy
+app.UseCors(CorsSettings.ALLOW_ALL_POLICY_NAME);
 app.UseRouting();
 
 app.UseEndpoints(endpoints =>
