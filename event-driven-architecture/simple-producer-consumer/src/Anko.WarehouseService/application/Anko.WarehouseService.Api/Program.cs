@@ -12,6 +12,16 @@ builder.Services.AddEndpointsApiExplorer();
 // Add shared infrastructure
 builder.Services.AddWarehouseInfrastructure(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "AllowAll",
+                      policy  =>
+                      {
+                            policy.AllowAnyOrigin()
+                                    .AllowAnyMethod()
+                                    .AllowAnyHeader();
+                      });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -20,7 +30,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-
+app.UseCors("AllowAll");
 app.UseRouting();
 
 app.UseEndpoints(endpoints =>

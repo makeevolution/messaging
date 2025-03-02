@@ -1,7 +1,20 @@
-<p>table works!</p>
 <div class="mat-elevation-z8">
+  <!-- Angular table requires 3 things: mat-header-row, mat-row, and ng-containers containing the columns
+    1. The mat-header row defines which columns are displayed through displayedColumns
+    2. The mat-row defines the data source for the table, and exposes an iterator for each row
+    3. The ng-containers define the columns of the table
+    5. The mat-header-cell in the ng-container defines the header of the column, what it looks like, whether the column is sortable, etc.
+    4. The mat-cell in the ng-container defines the content of each cell in the column
+
+   -->
   <mat-table [dataSource]="dataSource" matSort>
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <!-- The * in front of the matHeaderRowDef indicates it is a structural directive 
+    This is a shorthand/syntatic sugar of the following:
+    <ng-template [matHeaderRowDef]="displayedColumns">
+      <mat-header-row></mat-header-row>
+    </ng-template> 
+    -->
     <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     <!-- Each ng container below defines the current column under consideration. 
           The *matCellDef directive is used to define the content of the cell.

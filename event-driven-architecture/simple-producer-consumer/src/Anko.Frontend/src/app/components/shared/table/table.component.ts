@@ -1,10 +1,9 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
-import {MatSort, MatSortModule} from '@angular/material/sort';
-import {MatTableDataSource, MatTableModule} from '@angular/material/table';
-import {TableContent} from '../../../models/table';
-import {MatPaginator} from '@angular/material/paginator';
-import { BrowserModule } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
+import { AfterViewInit, Component, Input, ViewChild } from '@angular/core';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { TableContent } from 'src/app/models/table';
+import { MatPaginator } from '@angular/material/paginator';
+
 @Component({
   selector: 'app-table',
   standalone: true,
@@ -22,21 +21,25 @@ import { CommonModule } from '@angular/common';
 // AfterViewInit is a lifecycle hook that is called after Angular has fully initialized a component's view.
 // This guarantees that the view is fully initialized and you can access the view's DOM.
 export class TableComponent implements AfterViewInit {
-  dataSource : MatTableDataSource<TableContent>;
+  // Assert dataSource is undefined since TableComponent is meant to be used by other components.
+  // They have to set the dataSource using the setContents method.
+  dataSource! : MatTableDataSource<TableContent>;
+  displayedColumns!: string[] 
 
-  // ViewChild is a decorator that configures a view query. 
-  // The change detector looks for the first element or the directive matching the selector in the view DOM. 
+  // ViewChild is a decorator that configures a view query.
+  // The change detector looks for the first element or the directive matching the selector in the view DOM.
   // If the view DOM changes, and a new child matches the selector, the property is updated.
   @ViewChild(MatSort) sort!: MatSort;  // This is bound to matSort directive in the template.
-  @ViewChild(MatPaginator) paginator!: MatPaginator;  // TOOO: Add this functionality
-  displayedColumns: string[] = ['name', 'price'];
-  constructor() {
-    const items: TableContent[] = [
-      {name: 'ftem 1', price: 100, category: 'Category 1'},
-      {name: 'Item 2', price: 1003, category: 'Category 2'},
-      {name: 'Item 9', price: 100, category: 'Category 2'},
-    ]
-    this.dataSource = new MatTableDataSource(items);
+  @ViewChild(MatPaginator) paginator!: MatPaginator;  // TOOO: Add this functionality if desired
+
+  /* this function is called when the setColumns input is set in the parent component */
+  @Input() set setColumns(columns: string[]) {
+    this.displayedColumns = columns;
+  }
+
+  /* this function is called when the setContents input is set in the parent component */
+  @Input() set setContents(contents: TableContent[]) {
+    this.dataSource = new MatTableDataSource(contents);
   }
 
   ngAfterViewInit() {
