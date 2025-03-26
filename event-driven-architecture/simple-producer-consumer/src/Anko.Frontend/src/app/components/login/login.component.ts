@@ -7,6 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { LoaderComponent } from '../shared/loader/loader.component';
 import { Router } from '@angular/router';
+import { Paths } from 'src/app/static-data/paths';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -30,7 +31,7 @@ export class LoginComponent {
   login(): void {
     this.loading = true;
     setTimeout(() => {
-      this.router.navigate(['/view-all-items'])
+      this.router.navigate([Paths.ViewAllProducts])
     }, 2000);
   }
 }

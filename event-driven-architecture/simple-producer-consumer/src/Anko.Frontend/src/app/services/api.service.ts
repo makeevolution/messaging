@@ -14,7 +14,7 @@ export class ApiService {
         private http: HttpClient
     ){}
 
-    getItems(page=1, limit=10): Observable<any> {
+    getProducts(page=1, limit=10): Observable<any> {
         return this.http.get(`${WAREHOUSE_URL}/items`);
     }
 }

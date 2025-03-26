@@ -1,9 +1,15 @@
 <nav>
     <button
     type="button"
+    class="sidebar-toggle-button"
     (click)="toggleSidebar()">
         <mat-icon>'close icon'</mat-icon>
     </button>
     <h2>Anko</h2>
-    
+    <p class="basket">
+        <mat-icon matBadge="15" matBadgeColor="warn" matBadgeSize="large">shopping_basket</mat-icon>
+      </p>
+    <button mat-raised-button class="auth-button" type="button" onclick="login()">
+        Login
+    </button>
 </nav>
